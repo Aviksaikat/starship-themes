@@ -4,35 +4,30 @@ add_newline = true
 command_timeout = 20
 
 format = "$directory$git_branch$git_status$c$rust$golang$nodejs$python$cmd_duration$line_break$character"
-
 palette = "circuit-glacier"
 
 [directory]
-format = "[](fg:color_path)[󰀵 $path](fg:base bg:color_path)[](fg:color_path)"
+format = "[](fg:color_path)[󰀵 $path](fg:base bg:color_path)[](fg:color_path)"
 truncation_length = 3
 truncation_symbol = "…/"
 truncate_to_repo = false
 
 [git_branch]
-format = " [](fg:color_git)[$symbol$branch](fg:base bg:color_git)[](fg:color_git)"
+format = " [](fg:color_git)[$symbol$branch](fg:base bg:color_git)[](fg:color_git)"
 
 [git_status]
 format = "([ $all_status$ahead_behind](fg:color_git))"
 
 [c]
-format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
-
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 [rust]
-format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
-
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 [golang]
-format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
-
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 [nodejs]
-format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
-
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 [python]
-format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 
 [cmd_duration]
 show_milliseconds = false
@@ -47,5 +42,5 @@ error_symbol = "[❯](bold red)"
 color_path = "#00cf9a"
 color_git  = "#0097c6"
 color_lang = "#00a87e"
-color_time = "#007a60"
-base       = "#050d12"
+color_time = "#007a5a"
+base       = "#031a14"
