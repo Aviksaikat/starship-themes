@@ -4,77 +4,61 @@ add_newline = true
 command_timeout = 20
 
 format = """
-[](fg:color_path)\
 $directory\
-[](fg:color_path bg:color_git)\
 $git_branch\
 $git_status\
-[](fg:color_git bg:color_lang)\
-$c\
-$rust\
-$golang\
-$nodejs\
-$python\
-[](fg:color_lang)\
+$c$rust$golang$nodejs$python\
 $cmd_duration\
 $line_break\
 $character"""
 
 palette = "material-ocean"
 
+# --- path -------------------------------------------------------------------
 [directory]
-style = "fg:BASE bg:color_path"
-format = "[ $path ]($style)"
+format = "[](fg:color_path)[$path](fg:base bg:color_path)[](fg:color_path)"
 truncation_length = 3
 truncation_symbol = "…/"
+truncate_to_repo = false
 
+# --- git --------------------------------------------------------------------
 [git_branch]
-symbol = ""
-style = "fg:BASE bg:color_git"
-format = "[ $symbol $branch ]($style)"
+format = " [](fg:color_git)[$symbol$branch](fg:base bg:color_git)[](fg:color_git)"
 
+# Renders only when the working tree is dirty; nothing at all when clean.
 [git_status]
-style = "fg:BASE bg:color_git"
-format = "[[($all_status$ahead_behind )](fg:BASE bg:color_git)]($style)"
+format = "([ $all_status$ahead_behind](fg:color_git))"
 
+# --- languages (each renders only when detected) ----------------------------
 [c]
-symbol = " "
-style = "fg:BASE bg:color_lang"
-format = "[ $symbol($version) ]($style)"
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 
 [rust]
-symbol = ""
-style = "fg:BASE bg:color_lang"
-format = "[ $symbol($version) ]($style)"
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 
 [golang]
-symbol = ""
-style = "fg:BASE bg:color_lang"
-format = "[ $symbol($version) ]($style)"
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 
 [nodejs]
-symbol = ""
-style = "fg:BASE bg:color_lang"
-format = "[ $symbol($version) ]($style)"
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 
 [python]
-symbol = ""
-style = "fg:BASE bg:color_lang"
-format = "[ $symbol($version)(\($virtualenv\)) ]($style)"
+format = " [](fg:color_lang)[$symbol$version](fg:base bg:color_lang)[](fg:color_lang)"
 
+# --- command duration -------------------------------------------------------
 [cmd_duration]
 show_milliseconds = false
-format = " [$duration]($style) "
-style = "fg:color_time"
+format = " [$duration](fg:color_time)"
 min_time = 1000
 
+# --- character --------------------------------------------------------------
 [character]
 success_symbol = "[❯](bold fg:color_path)"
 error_symbol = "[❯](bold red)"
 
 [palettes.material-ocean]
 color_path = "#82aaff"
-color_git  = "#c792ea"
+color_git = "#c792ea"
 color_lang = "#80cbc4"
 color_time = "#546e7a"
-BASE       = "#0f111a"
+base = "#0f111a"
