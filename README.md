@@ -59,8 +59,75 @@ for your attention.
 ### ninetailedstarship-macchiato
 ![ninetailedstarship-macchiato](media/png/ninetailedstarship-macchiato.png)
 
+### vaporwave
+![vaporwave](media/png/vaporwave.png)
+
+### gruvbox-ember
+![gruvbox-ember](media/png/gruvbox-ember.png)
+
+### arch-os
+![arch-os](media/png/arch-os.png)
+
+### ccswe-dark
+![ccswe-dark](media/png/ccswe-dark.png)
+
+### ninetailedstarship-latte
+![ninetailedstarship-latte](media/png/ninetailedstarship-latte.png)
+
+### ninetailedstarship-frappe
+![ninetailedstarship-frappe](media/png/ninetailedstarship-frappe.png)
+
+### ninetailedstarship-macchiato
+![ninetailedstarship-macchiato](media/png/ninetailedstarship-macchiato.png)
+
 ### ninetailedstarship-mocha
 ![ninetailedstarship-mocha](media/png/ninetailedstarship-mocha.png)
+
+---
+
+## Warm / Organic
+
+### mossfire
+![mossfire](media/png/mossfire.png)
+
+### saffron-grove
+![saffron-grove](media/png/saffron-grove.png)
+
+### copper-bloom
+![copper-bloom](media/png/copper-bloom.png)
+
+---
+
+## Cold / Technical
+
+### cryogenic
+![cryogenic](media/png/cryogenic.png)
+
+### circuit-glacier
+![circuit-glacier](media/png/circuit-glacier.png)
+
+### event-horizon
+![event-horizon](media/png/event-horizon.png)
+
+---
+
+## Neon / Weird
+
+### acid-orchid
+![acid-orchid](media/png/acid-orchid.png)
+
+### laser-koi
+![laser-koi](media/png/laser-koi.png)
+
+### radioactive-candy
+![radioactive-candy](media/png/radioactive-candy.png)
+
+---
+
+## Misc
+
+### apple-ribbon
+![apple-ribbon](media/png/apple-ribbon.png)
 
 ---
 
