@@ -12,122 +12,94 @@ for your attention.
 ## Themes
 
 ### midnight-bloom
+_Dracula-adjacent, soft violet_
+
 ![midnight-bloom](media/png/midnight-bloom.png)
 
 ### dracula-classic
+_The canonical Dracula palette_
+
 ![dracula-classic](media/png/dracula-classic.png)
 
 ### catppuccin-mocha
+_Catppuccin Mocha_
+
 ![catppuccin-mocha](media/png/catppuccin-mocha.png)
 
 ### catppuccin-macchiato
+_Catppuccin Macchiato_
+
 ![catppuccin-macchiato](media/png/catppuccin-macchiato.png)
 
 ### cyber-tokyo
+_Neon magenta on near-black_
+
 ![cyber-tokyo](media/png/cyber-tokyo.png)
 
 ### tokyo-night-minimal
+_Tokyo Night, stripped back_
+
 ![tokyo-night-minimal](media/png/tokyo-night-minimal.png)
 
 ### tokyo-night-neo
+_Tokyo Night with neon accents_
+
 ![tokyo-night-neo](media/png/tokyo-night-neo.png)
 
 ### material-ocean
+_Material Ocean deep blue_
+
 ![material-ocean](media/png/material-ocean.png)
 
 ### nord-frost
+_Nord Frost arctic blue_
+
 ![nord-frost](media/png/nord-frost.png)
 
 ### vaporwave
+_Pink/cyan 80s retro_
+
 ![vaporwave](media/png/vaporwave.png)
 
 ### gruvbox-ember
+_Gruvbox warm amber_
+
 ![gruvbox-ember](media/png/gruvbox-ember.png)
 
 ### arch-os
+_Arch Linux signature blue_
+
 ![arch-os](media/png/arch-os.png)
 
 ### ccswe-dark
+_CCSWE red on charcoal_
+
 ![ccswe-dark](media/png/ccswe-dark.png)
 
 ### ninetailedstarship-latte
+_Catppuccin Latte, light bg_
+
 ![ninetailedstarship-latte](media/png/ninetailedstarship-latte.png)
 
 ### ninetailedstarship-frappe
+_Catppuccin Frappe_
+
 ![ninetailedstarship-frappe](media/png/ninetailedstarship-frappe.png)
 
 ### ninetailedstarship-macchiato
-![ninetailedstarship-macchiato](media/png/ninetailedstarship-macchiato.png)
+_Catppuccin Macchiato variant_
 
-### vaporwave
-![vaporwave](media/png/vaporwave.png)
-
-### gruvbox-ember
-![gruvbox-ember](media/png/gruvbox-ember.png)
-
-### arch-os
-![arch-os](media/png/arch-os.png)
-
-### ccswe-dark
-![ccswe-dark](media/png/ccswe-dark.png)
-
-### ninetailedstarship-latte
-![ninetailedstarship-latte](media/png/ninetailedstarship-latte.png)
-
-### ninetailedstarship-frappe
-![ninetailedstarship-frappe](media/png/ninetailedstarship-frappe.png)
-
-### ninetailedstarship-macchiato
 ![ninetailedstarship-macchiato](media/png/ninetailedstarship-macchiato.png)
 
 ### ninetailedstarship-mocha
+_Catppuccin Mocha variant_
+
 ![ninetailedstarship-mocha](media/png/ninetailedstarship-mocha.png)
 
----
-
-## Warm / Organic
-
-### mossfire
-![mossfire](media/png/mossfire.png)
-
 ### saffron-grove
+_Spice-market warmth, powerline arrows_
+
 ![saffron-grove](media/png/saffron-grove.png)
-
-### copper-bloom
-![copper-bloom](media/png/copper-bloom.png)
-
----
-
-## Cold / Technical
-
-### cryogenic
-![cryogenic](media/png/cryogenic.png)
-
-### circuit-glacier
-![circuit-glacier](media/png/circuit-glacier.png)
-
-### event-horizon
-![event-horizon](media/png/event-horizon.png)
-
----
-
-## Neon / Weird
-
-### acid-orchid
-![acid-orchid](media/png/acid-orchid.png)
-
-### laser-koi
-![laser-koi](media/png/laser-koi.png)
-
-### radioactive-candy
-![radioactive-candy](media/png/radioactive-candy.png)
-
----
-
-## Misc
-
-### apple-ribbon
-![apple-ribbon](media/png/apple-ribbon.png)
 
 ---
 
