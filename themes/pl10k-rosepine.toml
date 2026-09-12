@@ -1,0 +1,136 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+format = """
+[╭─](bold green)\
+[](fg:#26233A)\
+[$os](bg:#26233A)\
+[](fg:#31748F bg:#26233A)\
+[](fg:#9CCFD8 bg:#31748F)\
+[($status)](bg:#9CCFD8)\
+[$character](bg:#9CCFD8)\
+$env_var$username$hostname\
+[](fg:#9CCFD8 bg:#F6C177)\
+$directory\
+[](fg:#F6C177 bg:#EB6F92)\
+$git_branch\
+$git_status\
+[](fg:#EB6F92 bg:#EBBBCB)\
+$golang\
+$nodejs\
+$bun\
+$rust\
+$python\
+$ruby\
+$lua\
+[](fg:#EBBBCB bg:#C4A7E7)\
+$package\
+$aws\
+[](fg:#C4A7E7 bg:#31748F)\
+$docker_context\
+[](fg:#31748F bg:#26233A)\
+$time\
+[($shell)](bg:#26233A)\
+[ ](fg:#26233A)\
+[$line_break│](bold green)
+[╰─ ](bold green)
+"""
+
+continuation_prompt = "[╰─ ](bold green)"
+
+[line_break]
+disabled = false
+
+[character]
+success_symbol = "[](fg:green bg:#9CCFD8)"
+error_symbol = "[✘](fg:red bg:#9CCFD8)"
+
+[os]
+format = "[ $symbol ]($style)"
+style = "fg:#ffffff bg:#26233A"
+disabled = false
+
+[hostname]
+ssh_only = true
+style = "bg:#9CCFD8 fg:#000000"
+format = "[ $hostname ]($style)"
+trim_at = "-"
+
+[username]
+show_always = true
+style_user = "bg:#9CCFD8 fg:#000000"
+style_root = "bold bg:#9CCFD8 fg:#000000"
+format = "[ ($user) ]($style)"
+
+[directory]
+style = "bg:#F6C177 fg:#000000"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+style = "bg:#EB6F92"
+format = "[[ $symbol $branch ](fg:#000000 bg:#EB6F92)]($style)"
+
+[git_status]
+style = "bg:#EB6F92"
+format = "[[($all_status$ahead_behind )](fg:#000000 bg:#EB6F92)]($style)"
+
+[shell]
+disabled = false
+style = "fg:#ffffff bg:#26233A"
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:#26233A"
+format = "[[  $time ](fg:#ffffff bg:#26233A)]($style)"
+
+[status]
+disabled = false
+format = '[\[$status:$common_meaning\] ](fg:red bg:#9CCFD8)'
+
+[package]
+style = "fg:#000000 bg:#C4A7E7"
+format = "[$symbol $version ]($style)"
+
+[aws]
+style = "bg:#C4A7E7"
+format = "[[ $symbol $context ](bg:#C4A7E7)]($style) $path"
+
+[docker_context]
+style = "bg:#31748F"
+format = "[[ $symbol $context ](bg:#31748F)]($style) $path"
+
+[python]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
+
+[ruby]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
+
+[rust]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
+
+[golang]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
+
+[lua]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
+
+[bun]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
+
+[nodejs]
+style = "fg:#000000 bg:#EBBBCB"
+format = "[$symbol $version ]($style)"
