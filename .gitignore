@@ -20,3 +20,6 @@ build/
 
 # Misc
 *.bak
+
+# Design sketches (local exploration only)
+sketches/
