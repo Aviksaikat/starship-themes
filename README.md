@@ -18,7 +18,7 @@ for your attention.
 | 3 | `catppuccin-mocha` | Pure Catppuccin Mocha | `#1e1e2e` |
 | 4 | `catppuccin-macchiato` | Pure Catppuccin Macchiato | `#24273a` |
 | 5 | `cyber-tokyo` | Tokyo Night + neon magenta | `#1a1b26` |
-| 6 | `tokyo-night` | Pure Tokyo Night | `#1a1b26` |
+| 6 | `tokyo-night-minimal` | Pure Tokyo Night | `#1a1b26` |
 | 7 | `material-ocean` | Material Ocean | `#0f111a` |
 | 8 | `nord-frost` | Pure Nord | `#2e3440` |
 | 9 | `vaporwave` | Magenta / cyan / mint | `#1a1b26` |
@@ -28,6 +28,10 @@ Every palette is tuned to sit correctly on dark terminal backgrounds — Dracula
 (`#282a36`), Catppuccin Mocha (`#1e1e2e`) / Macchiato (`#24273a`) and Nord (`#2e3440`).
 The text inside each chip uses that palette's own base colour so the chips read as native
 to the theme rather than pasted on.
+
+> `tokyo-night-minimal` is named that way to coexist with an existing
+> `tokyo-night.toml` managed by another dotfiles repo — `install.sh` will not
+> overwrite a theme file it does not own.
 
 ---
 

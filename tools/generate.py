@@ -49,7 +49,7 @@ THEMES = {
         desc="Tokyo Night violets with a neon-magenta branch",
         path="#bb9af7", git="#ff2a6d", lang="#7dcfff", time="#565f89", base="#1a1b26",
     ),
-    "tokyo-night": dict(
+    "tokyo-night-minimal": dict(
         desc="Pure Tokyo Night — cool blue and violet",
         path="#7aa2f7", git="#bb9af7", lang="#73daca", time="#565f89", base="#1a1b26",
     ),
