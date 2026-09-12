@@ -1,0 +1,80 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+add_newline = true
+command_timeout = 20
+
+format = """
+[](fg:color_path)\
+$directory\
+[](fg:color_path bg:color_git)\
+$git_branch\
+$git_status\
+[](fg:color_git bg:color_lang)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$python\
+[](fg:color_lang)\
+$cmd_duration\
+$line_break\
+$character"""
+
+palette = "cyber-tokyo"
+
+[directory]
+style = "fg:BASE bg:color_path"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "fg:BASE bg:color_git"
+format = "[ $symbol $branch ]($style)"
+
+[git_status]
+style = "fg:BASE bg:color_git"
+format = "[[($all_status$ahead_behind )](fg:BASE bg:color_git)]($style)"
+
+[c]
+symbol = " "
+style = "fg:BASE bg:color_lang"
+format = "[ $symbol($version) ]($style)"
+
+[rust]
+symbol = ""
+style = "fg:BASE bg:color_lang"
+format = "[ $symbol($version) ]($style)"
+
+[golang]
+symbol = ""
+style = "fg:BASE bg:color_lang"
+format = "[ $symbol($version) ]($style)"
+
+[nodejs]
+symbol = ""
+style = "fg:BASE bg:color_lang"
+format = "[ $symbol($version) ]($style)"
+
+[python]
+symbol = ""
+style = "fg:BASE bg:color_lang"
+format = "[ $symbol($version)(\($virtualenv\)) ]($style)"
+
+[cmd_duration]
+show_milliseconds = false
+format = " [$duration]($style) "
+style = "fg:color_time"
+min_time = 1000
+
+[character]
+success_symbol = "[❯](bold fg:color_path)"
+error_symbol = "[❯](bold red)"
+
+[palettes.cyber-tokyo]
+color_path = "#bb9af7"
+color_git  = "#ff2a6d"
+color_lang = "#7dcfff"
+color_time = "#565f89"
+BASE       = "#1a1b26"
