@@ -7,7 +7,7 @@ Design: [2026-09-12-starship-theme-design.md](./2026-09-12-starship-theme-design
 
 ## Phase 1 — Scaffold
 
-- [x] T1 `git clone` to `~/Work/aviksaikat/github/starship-theme`
+- [x] T1 `git clone` to `~/git_projects/github/starship-theme`
 - [x] T2 `themes/`, `tools/`, `docs/plans/` directories
 - [x] T3 `.gitignore` (macOS, editor, Python noise)
 
