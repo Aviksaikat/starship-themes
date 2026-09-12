@@ -2,8 +2,11 @@
 """Verify every generated theme actually renders styled pills.
 
 Per theme, in four scenarios (dirty repo / clean repo / non-git dir / python project):
+  * Apple glyph (󰀵) is present in the theme source file
   * no config parse error on stderr
   * path pill: chip background present, BOTH caps painted in colour_path
+  * Apple glyph appears INSIDE the path chip body — after the color_path bg-colour
+    escape and before the first subsequent right-cap (U+E0B4) or hard reset ESC[0m
   * git pill : chip background present, caps painted in colour_git (repos only)
   * lang pill: chip background present (python project only)
   * no stray powerline arrow anywhere
@@ -20,6 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 L, R = "\ue0b6", "\ue0b4"
 ARROW = "\ue0b0"
+APPLE = "\U000f0035"  # 󰀵 Nerd Font Apple glyph — must appear in every theme
 
 SCEN = {
     "dirty": "/tmp/sstest/dirty",
@@ -56,6 +60,53 @@ def painted_cap(out, colour, cap):
     return re.search(pat, out) is not None
 
 
+def apple_in_path_chip(out, color_path):
+    """True iff the Apple glyph appears INSIDE the directory pill body.
+
+    'Inside the pill body' means the glyph appears:
+      1. After an SGR escape that sets bg to color_path  (params may be combined,
+         e.g. ESC[48;2;r;g;b;38;2;r;g;bm — Starship merges bg and fg into one)
+      2. Before the first right-cap U+E0B4 or hard reset ESC[0m / ESC[m that
+         follows that background escape.
+
+    Strips zsh %{...%} prompt wrappers before analysing so escape sequences are
+    contiguous and positions are comparable.
+    """
+    # Normalise: remove zsh prompt wrappers so escapes are contiguous.
+    clean = out.replace("%{", "").replace("%}", "")
+
+    # Match any SGR escape that contains the bg color_path parameters.
+    # Starship often emits combined sequences: ESC[48;2;r;g;b;38;2;r;g;bm
+    # so we search for 48;2;r;g;b as a substring within any CSI params.
+    bg_sub = "48;2;" + rgb(color_path)  # e.g. "48;2;137;180;250"
+    # Find the SGR escape (ESC[...m) whose params contain this substring.
+    # Regex: ESC [ (params-containing-bg_sub) m
+    bg_pat = re.compile(
+        r"\x1b\[" + r"[0-9;]*" + re.escape(bg_sub) + r"[0-9;]*m"
+    )
+    m = bg_pat.search(clean)
+    if m is None:
+        return False
+
+    after_bg = clean[m.end():]
+
+    apple_pos = after_bg.find(APPLE)
+    if apple_pos == -1:
+        return False
+
+    # Pill body ends at the first right cap or hard reset after the bg escape.
+    cap_pos = after_bg.find(R)
+    # Match ESC[0m or ESC[m (hard reset)
+    reset_m = re.search(r"\x1b\[0?m", after_bg)
+    reset_pos = reset_m.start() if reset_m else -1
+    end_positions = [p for p in (cap_pos, reset_pos) if p >= 0]
+    if not end_positions:
+        # No pill end found — accept if Apple is present (graceful fallback).
+        return True
+
+    return apple_pos < min(end_positions)
+
+
 def main():
     themes = sorted(f for f in os.listdir(os.path.join(ROOT, "themes"))
                     if f.endswith(".toml"))
@@ -63,8 +114,15 @@ def main():
 
     for t in themes:
         cfg = os.path.join(ROOT, "themes", t)
-        pal = read_palette(open(cfg, encoding="utf-8").read())
+        raw = open(cfg, encoding="utf-8").read()
+        pal = read_palette(raw)
         name = t[:-5]
+
+        # Assert Apple glyph is present in the TOML source (inside directory format)
+        if APPLE not in raw:
+            failures.append(f"{name}: missing Apple glyph (󰀵) in theme file")
+            print(f"  FAIL  {name:24s} [Apple glyph missing in source]")
+            continue
 
         for scen, cwd in SCEN.items():
             out, err = run(["prompt"], cfg, cwd)
@@ -73,6 +131,16 @@ def main():
                 problems.append("PARSE-ERROR")
             if ARROW in out:
                 problems.append("STRAY-ARROW")
+
+            # Strong positional check: Apple must appear INSIDE the path chip body —
+            # after the color_path background escape, before the right cap or reset.
+            # A simple substring match anywhere in output is NOT sufficient.
+            if not apple_in_path_chip(out, pal["color_path"]):
+                # Diagnose: is it missing entirely, or in the wrong position?
+                if APPLE not in out:
+                    problems.append("apple-glyph-missing-in-output")
+                else:
+                    problems.append("apple-glyph-outside-path-chip")
 
             want = [pal["color_path"]]
             if scen in ("dirty", "clean"):

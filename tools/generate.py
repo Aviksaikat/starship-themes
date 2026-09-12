@@ -2,7 +2,7 @@
 """Generate the starship-theme TOML files from a single template.
 
 Design: minimal rounded-chip prompt.
-  <path pill> <git branch pill> <git status text> <lang pills> <dim cmd_duration>
+  <apple prefix> <path pill> <git branch pill> <git status text> <lang pills> <dim cmd_duration>
   ❯
 
 Rules learned the hard way (starship 1.26):
@@ -17,6 +17,10 @@ Rules learned the hard way (starship 1.26):
   * Each pill carries BOTH caps, so a segment that is absent never leaves a
     dangling cap behind.
   * truncate_to_repo = false so the path is always the last 3 components.
+  * Apple glyph 󰀵 (U+F0035 Nerd Font) is embedded inside the directory pill
+    content as `󰀵 $path` — it shares the chip's background colour so it
+    reads as part of the path chip, not a standalone prefix. This is the
+    correct visual appearance (logo inside the rounded chip on macOS).
 
 Run:  python3 tools/generate.py
 """
@@ -27,8 +31,10 @@ L = "\ue0b6"  #  rounded left cap
 R = "\ue0b4"  #  rounded right cap
 ARROW = "\u276f"  # ❯
 ELLIPSIS = "\u2026"  # …
+APPLE = "\U000f0035"  # 󰀵  Nerd Font Apple glyph (macOS)
 
 THEMES = {
+    # ── original 10 themes ────────────────────────────────────────────────
     "midnight-bloom": dict(
         desc="Catppuccin Mocha base with a Dracula-pink git branch",
         path="#89b4fa", git="#ff79c6", lang="#94e2d5", time="#6c7086", base="#1e1e2e",
@@ -69,78 +75,122 @@ THEMES = {
         desc="Gruvbox Dark — warm embers and retro yellow",
         path="#d79921", git="#fe8019", lang="#8ec07c", time="#665c54", base="#282828",
     ),
+    # ── 7 new themes ──────────────────────────────────────────────────────
+    "arch-os": dict(
+        desc="Arch OS — polar-night base (#2e3440), snow-storm path (#d8dee9), aurora-green git (#a3be8c), aurora-yellow lang (#ebcb8b), dim time (#4c566a)",
+        path="#d8dee9", git="#a3be8c", lang="#ebcb8b", time="#4c566a", base="#2e3440",
+    ),
+    "tokyo-night-neo": dict(
+        desc="Tokyo Night Neo — electric blue path, neon-magenta branch",
+        path="#769ff0", git="#ff2a6d", lang="#7dcfff", time="#565f89", base="#0f111a",
+    ),
+    "ccswe-dark": dict(
+        desc="CoryCharlton dark — indigo path, ember git, emerald lang",
+        path="#769ff0", git="#eb4d28", lang="#5fa04e", time="#999999", base="#1d2230",
+    ),
+    "ninetailedstarship-latte": dict(
+        desc="Ninetailed Catppuccin Latte — teal path, mauve git, green lang",
+        path="#179299", git="#8839ef", lang="#40a02b", time="#6c6f85", base="#eff1f5",
+    ),
+    "ninetailedstarship-frappe": dict(
+        desc="Ninetailed Catppuccin Frappé — sky path, mauve git, teal lang",
+        path="#99d1db", git="#ca9ee6", lang="#81c8be", time="#737994", base="#303446",
+    ),
+    "ninetailedstarship-macchiato": dict(
+        desc="Ninetailed Catppuccin Macchiato — teal path, lavender git",
+        path="#8bd5ca", git="#c6a0f6", lang="#91d7e3", time="#6e738d", base="#24273a",
+    ),
+    "ninetailedstarship-mocha": dict(
+        desc="Ninetailed Catppuccin Mocha — pink path, mauve git, teal lang",
+        path="#f38ba8", git="#cba6f7", lang="#94e2d5", time="#585b70", base="#1e1e2e",
+    ),
 }
+
 
 # One pill builder: cap / content / cap, all lower-case palette refs.
 def pill(color, content, prefix=" "):
-    return (f'{prefix}[{L}](fg:{color})[{content}](fg:base bg:{color})[{R}](fg:{color})')
+    return f'{prefix}[{L}](fg:{color})[{content}](fg:base bg:{color})[{R}](fg:{color})'
 
 
-TEMPLATE = '''"$schema" = "https://starship.rs/config-schema.json"
+def build_toml(name, path, git, lang, time, base, **_ignored):
+    """Build a complete TOML config string for one theme.
 
-add_newline = true
-command_timeout = 20
+    The Apple glyph 󰀵 is embedded inside the directory pill content, so it
+    shares the chip's background colour and reads as part of the path chip.
+    format = is a single TOML basic string (no multiline magic needed).
+    """
+    path_pill = pill("color_path", f"{APPLE} $path", prefix="")
+    git_pill  = pill("color_git",  "$symbol$branch")
+    lang_pill = pill("color_lang", "$symbol$version")
 
-format = """
-$directory\\
-$git_branch\\
-$git_status\\
-$c$rust$golang$nodejs$python\\
-$cmd_duration\\
-$line_break\\
-$character"""
+    # Single-line format value: module refs only (Apple is inside $directory pill).
+    fmt = ("$directory"
+           "$git_branch"
+           "$git_status"
+           "$c$rust$golang$nodejs$python"
+           "$cmd_duration"
+           "$line_break"
+           "$character")
 
-palette = "{name}"
-
-# --- path -------------------------------------------------------------------
-[directory]
-format = "{path_pill}"
-truncation_length = 3
-truncation_symbol = "{ELLIPSIS}/"
-truncate_to_repo = false
-
-# --- git --------------------------------------------------------------------
-[git_branch]
-format = "{git_pill}"
-
-# Renders only when the working tree is dirty; nothing at all when clean.
-[git_status]
-format = "([ $all_status$ahead_behind](fg:color_git))"
-
-# --- languages (each renders only when detected) ----------------------------
-[c]
-format = "{lang_pill}"
-
-[rust]
-format = "{lang_pill}"
-
-[golang]
-format = "{lang_pill}"
-
-[nodejs]
-format = "{lang_pill}"
-
-[python]
-format = "{lang_pill}"
-
-# --- command duration -------------------------------------------------------
-[cmd_duration]
-show_milliseconds = false
-format = " [$duration](fg:color_time)"
-min_time = 1000
-
-# --- character --------------------------------------------------------------
-[character]
-success_symbol = "[{ARROW}](bold fg:color_path)"
-error_symbol = "[{ARROW}](bold red)"
-
-[palettes.{name}]
-color_path = "{path}"
-color_git = "{git}"
-color_lang = "{lang}"
-color_time = "{time}"
-base = "{base}"
-'''
+    return (
+        f'"$schema" = "https://starship.rs/config-schema.json"\n'
+        f'\n'
+        f'add_newline = true\n'
+        f'command_timeout = 20\n'
+        f'\n'
+        f'format = "{fmt}"\n'
+        f'\n'
+        f'palette = "{name}"\n'
+        f'\n'
+        f'# --- path -------------------------------------------------------------------\n'
+        f'[directory]\n'
+        f'format = "{path_pill}"\n'
+        f'truncation_length = 3\n'
+        f'truncation_symbol = "{ELLIPSIS}/"\n'
+        f'truncate_to_repo = false\n'
+        f'\n'
+        f'# --- git --------------------------------------------------------------------\n'
+        f'[git_branch]\n'
+        f'format = "{git_pill}"\n'
+        f'\n'
+        f'# Renders only when the working tree is dirty; nothing at all when clean.\n'
+        f'[git_status]\n'
+        f'format = "([ $all_status$ahead_behind](fg:color_git))"\n'
+        f'\n'
+        f'# --- languages (each renders only when detected) ----------------------------\n'
+        f'[c]\n'
+        f'format = "{lang_pill}"\n'
+        f'\n'
+        f'[rust]\n'
+        f'format = "{lang_pill}"\n'
+        f'\n'
+        f'[golang]\n'
+        f'format = "{lang_pill}"\n'
+        f'\n'
+        f'[nodejs]\n'
+        f'format = "{lang_pill}"\n'
+        f'\n'
+        f'[python]\n'
+        f'format = "{lang_pill}"\n'
+        f'\n'
+        f'# --- command duration -------------------------------------------------------\n'
+        f'[cmd_duration]\n'
+        f'show_milliseconds = false\n'
+        f'format = " [$duration](fg:color_time)"\n'
+        f'min_time = 1000\n'
+        f'\n'
+        f'# --- character --------------------------------------------------------------\n'
+        f'[character]\n'
+        f'success_symbol = "[{ARROW}](bold fg:color_path)"\n'
+        f'error_symbol = "[{ARROW}](bold red)"\n'
+        f'\n'
+        f'[palettes.{name}]\n'
+        f'color_path = "{path}"\n'
+        f'color_git = "{git}"\n'
+        f'color_lang = "{lang}"\n'
+        f'color_time = "{time}"\n'
+        f'base = "{base}"\n'
+    )
 
 
 def main():
@@ -148,14 +198,8 @@ def main():
     outdir = os.path.join(root, "themes")
     os.makedirs(outdir, exist_ok=True)
 
-    pills = dict(
-        path_pill=pill("color_path", "$path", prefix=""),
-        git_pill=pill("color_git", "$symbol$branch"),
-        lang_pill=pill("color_lang", "$symbol$version"),
-    )
-
     for name, p in THEMES.items():
-        body = TEMPLATE.format(name=name, ARROW=ARROW, ELLIPSIS=ELLIPSIS, **pills, **p)
+        body = build_toml(name, **p)
         with open(os.path.join(outdir, name + ".toml"), "w", encoding="utf-8") as fh:
             fh.write(body)
         print("wrote themes/" + name + ".toml")

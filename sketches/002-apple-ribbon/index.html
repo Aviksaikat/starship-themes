@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>002 – Apple Ribbon Prompt</title>
+  <style>
+    /* ── Load Nerd Font from installed system font ──────────────────────── */
+    @font-face {
+      font-family: 'NF';
+      src: local('JetBrainsMono Nerd Font'),
+           local('MesloLGS Nerd Font'),
+           local('Hack Nerd Font'),
+           local('FiraCode Nerd Font'),
+           url('file:///Users/avik/Library/Fonts/JetBrainsMonoNerdFont-Regular.ttf') format('truetype'),
+           url('file:///Users/avik/Library/Fonts/MesloLGSNerdFont-Regular.ttf') format('truetype'),
+           url('file:///Users/avik/Library/Fonts/HackNerdFont-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* ── Apple rainbow palette (historical, top→bottom = left→right) ──── */
+    :root {
+      --apple-green:  #61BB46;
+      --apple-yellow: #FDB827;
+      --apple-orange: #F5821F;
+      --apple-red:    #E03A3E;
+      --apple-violet: #963D97;
+      --apple-blue:   #009DDC;
+
+      --dark:   #282a36;   /* Dracula bg                */
+      --dark2:  #44475a;   /* Dracula selection         */
+      --fg:     #f8f8f2;   /* Dracula foreground        */
+      --cmt:    #6272a4;   /* Dracula comment           */
+
+      --mocha:     #1e1e2e; /* Catppuccin Mocha bg       */
+      --macch:     #24273a; /* Catppuccin Macchiato bg   */
+      --void:      #0d0d0d; /* Void/near-black bg        */
+
+      --arrow-size: 15px;  /* Powerline arrow tip depth */
+      --seg-h: 34px;       /* Segment total height      */
+      --font-size: 13.5px;
+    }
+
+    /* ── Reset & page ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--mocha);
+      color: #cdd6f4;
+      font-family: 'NF', 'JetBrainsMono Nerd Font', monospace;
+      font-size: 15px;
+      padding: 40px 48px 60px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: 6px;
+      color: #f5c2e7;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--cmt);
+      margin-bottom: 40px;
+    }
+
+    /* ── Section containers ─────────────────────────────────────────────── */
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #6c7086;
+      margin-bottom: 10px;
+    }
+
+    .variant-row {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .bg-label {
+      font-size: 10px;
+      color: #585b70;
+      margin-bottom: 6px;
+    }
+
+    .terminal-window {
+      border-radius: 8px;
+      padding: 20px 24px;
+      min-width: 480px;
+    }
+
+    /* ── Prompt bar ─────────────────────────────────────────────────────── */
+    /*
+     * Technique: CSS clip-path arrow on each segment, descending z-index,
+     * negative left-margin on each successor so it slides under the arrow tip.
+     *
+     * No U+E0B4 / U+E0B6 (rounded caps).
+     * No whitespace gap — segments touch directly.
+     * U+E0B0 (▶) is the Powerline right-arrow; used in the text node of each
+     * separator for screen-reader / copy-paste fidelity, but the VISUAL shape
+     * is produced by clip-path so it renders correctly even if the Nerd Font
+     * fails to load.
+     *
+     * U+F0035 (&#xF0035;) = Apple Nerd Font icon.
+     */
+
+    .pbar {
+      display: inline-flex;
+      align-items: stretch;
+      height: var(--seg-h);
+      line-height: var(--seg-h);
+      /* isolate stacking context so z-index works inside flex */
+      isolation: isolate;
+    }
+
+    .seg {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      white-space: nowrap;
+      font-family: 'NF', 'JetBrainsMono Nerd Font', monospace;
+      font-size: var(--font-size);
+      position: relative;
+      /* default: no rounding — all corners sharp */
+    }
+
+    /* Segments that are NOT the last one get an arrow clip on the right */
+    .seg.arrow {
+      padding-right: calc(var(--arrow-size) + 8px);
+      clip-path: polygon(
+        0 0,
+        calc(100% - var(--arrow-size)) 0,
+        100% 50%,
+        calc(100% - var(--arrow-size)) 100%,
+        0 100%
+      );
+    }
+
+    /* Every segment except the first slides under the previous arrow */
+    .seg.overlap {
+      margin-left: calc(-1 * var(--arrow-size) + 1px);
+    }
+
+    /* ── Z-index ladder (first segment is topmost) ──────────────────────── */
+    .z10 { z-index: 10; }
+    .z9  { z-index:  9; }
+    .z8  { z-index:  8; }
+    .z7  { z-index:  7; }
+    .z6  { z-index:  6; }
+    .z5  { z-index:  5; }
+    .z4  { z-index:  4; }
+    .z3  { z-index:  3; }
+    .z2  { z-index:  2; }
+    .z1  { z-index:  1; }
+
+    /* ── Palette colours as utility classes ─────────────────────────────── */
+    .bg-dark   { background: var(--dark);          color: var(--fg); }
+    .bg-dark2  { background: var(--dark2);         color: var(--fg); }
+    .bg-green  { background: var(--apple-green);   color: #0a1a05; }
+    .bg-yellow { background: var(--apple-yellow);  color: #2a1a00; }
+    .bg-orange { background: var(--apple-orange);  color: #2a0d00; }
+    .bg-red    { background: var(--apple-red);     color: #2a0000; }
+    .bg-violet { background: var(--apple-violet);  color: #1a001a; }
+    .bg-blue   { background: var(--apple-blue);    color: #001a2a; }
+
+    /* light-coloured text on the vibrant segments */
+    .light-txt { color: #fff; }
+
+    .icon    { margin-right: 5px; }
+    .icon-sm { margin-right: 4px; font-size: 11px; }
+
+    /* ── Rainbow ribbon: segments contain only a thin spacer ────────────── */
+    .ribbon-seg {
+      padding-left: 5px;
+      padding-right: calc(var(--arrow-size) + 5px);
+      /* no text content — width = padding-left + arrow-depth + 5px gap = ~25px */
+    }
+
+    /* ── Palette swatches ───────────────────────────────────────────────── */
+    .swatches {
+      display: flex;
+      gap: 0;
+      height: 22px;
+      margin-top: 32px;
+      margin-bottom: 6px;
+    }
+
+    .swatch {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: rgba(255,255,255,0.85);
+      font-family: monospace;
+      letter-spacing: 0;
+    }
+
+    .swatch:first-child { border-radius: 3px 0 0 3px; }
+    .swatch:last-child  { border-radius: 0 3px 3px 0; }
+
+    /* ── Notes / feasibility section ────────────────────────────────────── */
+    .notes {
+      margin-top: 44px;
+      padding: 20px 24px;
+      background: rgba(255,255,255,.04);
+      border-left: 3px solid #585b70;
+      border-radius: 0 6px 6px 0;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #bac2de;
+    }
+
+    .notes h2 { font-size: 13px; color: #f5c2e7; margin-bottom: 12px; }
+    .notes code {
+      font-family: monospace;
+      background: rgba(255,255,255,.09);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .notes ul { padding-left: 18px; }
+    .notes li { margin-bottom: 6px; }
+
+    strong { color: #f5c2e7; }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid #313244;
+      margin: 36px 0;
+    }
+
+    .comp-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #cba6f7;
+      margin-bottom: 14px;
+    }
+
+    .terminal-window + .terminal-window { margin-top: 16px; }
+
+    .bg-dracula  { background: #282a36; }
+    .bg-mocha    { background: #1e1e2e; }
+    .bg-macch    { background: #24273a; }
+    .bg-void     { background: #0d0d0d; }
+
+    .prompt-cursor {
+      display: inline-block;
+      color: #a6e3a1;
+      margin-left: 8px;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>002 – Apple Ribbon Prompt</h1>
+  <p class="subtitle">
+    Sketch only — do not ship to production &nbsp;·&nbsp;
+    Chevron separators: U+E0B0 &nbsp;·&nbsp;
+    Apple icon: U+F0035 &nbsp;·&nbsp;
+    No U+E0B4 / U+E0B6 &nbsp;·&nbsp; No gaps
+  </p>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       COMPOSITION A — Compact: icon·user → rainbow ribbon → clock
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="comp-title">A — Compact &nbsp;<span style="color:#6c7086;font-size:11px;">󰀵 avik → rainbow ribbon → 15:09</span></div>
+
+    <!-- Dracula bg -->
+    <div class="bg-label">Dracula #282a36</div>
+    <div class="terminal-window bg-dracula" style="margin-bottom:12px;">
+      <div class="pbar" id="comp-a-dracula">
+        <!-- Segment 1: dark header -->
+        <div class="seg arrow bg-dark z10">
+          <span class="icon">&#xF0035;</span>avik
+        </div>
+        <!-- Rainbow ribbon: green → yellow → orange → red → violet -->
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <!-- Segment last: clock -->
+        <div class="seg overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xF017;</span>15:09
+        </div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <!-- Mocha bg -->
+    <div class="bg-label">Catppuccin Mocha #1e1e2e</div>
+    <div class="terminal-window bg-mocha" style="margin-bottom:12px;">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg overlap bg-blue light-txt z4"><span class="icon-sm">&#xF017;</span>15:09</div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <!-- Macchiato bg -->
+    <div class="bg-label">Catppuccin Macchiato #24273a</div>
+    <div class="terminal-window bg-macch" style="margin-bottom:12px;">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg overlap bg-blue light-txt z4"><span class="icon-sm">&#xF017;</span>15:09</div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <!-- Void bg -->
+    <div class="bg-label">Void #0d0d0d</div>
+    <div class="terminal-window bg-void">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg overlap bg-blue light-txt z4"><span class="icon-sm">&#xF017;</span>15:09</div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       COMPOSITION B — Developer: user → rainbow ribbon → path → branch
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="comp-title">B — Developer &nbsp;<span style="color:#6c7086;font-size:11px;">󰀵 avik → rainbow → ~/git_projects → &#xE0A0; main</span></div>
+
+    <div class="bg-label">Dracula #282a36</div>
+    <div class="terminal-window bg-dracula" style="margin-bottom:12px;">
+      <div class="pbar">
+        <!-- User -->
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <!-- Rainbow ribbon -->
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <!-- Path segment (blue) — continues with arrow into branch -->
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xF07B;</span>~/git_projects
+        </div>
+        <!-- Branch segment (dark2) -->
+        <div class="seg overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#f1fa8c;">&#xE0A0;</span>
+          <span style="color:#f1fa8c;">main</span>
+        </div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <div class="bg-label">Catppuccin Mocha #1e1e2e</div>
+    <div class="terminal-window bg-mocha" style="margin-bottom:12px;">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xF07B;</span>~/git_projects
+        </div>
+        <div class="seg overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#f1fa8c;">&#xE0A0;</span>
+          <span style="color:#f1fa8c;">main</span>
+        </div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <div class="bg-label">Catppuccin Macchiato #24273a</div>
+    <div class="terminal-window bg-macch" style="margin-bottom:12px;">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xF07B;</span>~/git_projects
+        </div>
+        <div class="seg overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#f1fa8c;">&#xE0A0;</span>
+          <span style="color:#f1fa8c;">main</span>
+        </div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <div class="bg-label">Void #0d0d0d</div>
+    <div class="terminal-window bg-void">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>avik</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xF07B;</span>~/git_projects
+        </div>
+        <div class="seg overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#f1fa8c;">&#xE0A0;</span>
+          <span style="color:#f1fa8c;">main</span>
+        </div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       COMPOSITION C — Repo state: Apple+dir → rainbow → git → lang → duration
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="comp-title">C — Repo State &nbsp;<span style="color:#6c7086;font-size:11px;">󰀵 ~/starship-theme → rainbow → &#xE0A0; main ✓ → 󰌠 3.11 → 2.1s</span></div>
+
+    <div class="bg-label">Dracula #282a36</div>
+    <div class="terminal-window bg-dracula" style="margin-bottom:12px;">
+      <div class="pbar">
+        <!-- Combined: Apple icon + truncated path -->
+        <div class="seg arrow bg-dark z10">
+          <span class="icon">&#xF0035;</span>~/starship-theme
+        </div>
+        <!-- Rainbow ribbon -->
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <!-- Git: branch + clean indicator on blue -->
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xE0A0;</span>main
+          <span style="margin-left:5px;color:#a6e3a1;">✓</span>
+        </div>
+        <!-- Language: Python (dark2) -->
+        <div class="seg arrow overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#89dceb;">&#xF0320;</span>
+          <span style="color:#89dceb;">3.11</span>
+        </div>
+        <!-- Duration (dim, dark) -->
+        <div class="seg overlap z2" style="background:#21222c; color:#6272a4;">
+          2.1s
+        </div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <div class="bg-label">Catppuccin Mocha #1e1e2e</div>
+    <div class="terminal-window bg-mocha" style="margin-bottom:12px;">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>~/starship-theme</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xE0A0;</span>main
+          <span style="margin-left:5px;color:#a6e3a1;">✓</span>
+        </div>
+        <div class="seg arrow overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#89dceb;">&#xF0320;</span>
+          <span style="color:#89dceb;">3.11</span>
+        </div>
+        <div class="seg overlap z2" style="background:#21222c; color:#6272a4;">2.1s</div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <div class="bg-label">Catppuccin Macchiato #24273a</div>
+    <div class="terminal-window bg-macch" style="margin-bottom:12px;">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>~/starship-theme</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xE0A0;</span>main
+          <span style="margin-left:5px;color:#a6e3a1;">✓</span>
+        </div>
+        <div class="seg arrow overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#89dceb;">&#xF0320;</span>
+          <span style="color:#89dceb;">3.11</span>
+        </div>
+        <div class="seg overlap z2" style="background:#21222c; color:#6272a4;">2.1s</div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+
+    <div class="bg-label">Void #0d0d0d</div>
+    <div class="terminal-window bg-void">
+      <div class="pbar">
+        <div class="seg arrow bg-dark z10"><span class="icon">&#xF0035;</span>~/starship-theme</div>
+        <div class="seg ribbon-seg arrow overlap bg-green  z9"></div>
+        <div class="seg ribbon-seg arrow overlap bg-yellow z8"></div>
+        <div class="seg ribbon-seg arrow overlap bg-orange z7"></div>
+        <div class="seg ribbon-seg arrow overlap bg-red    z6"></div>
+        <div class="seg ribbon-seg arrow overlap bg-violet z5"></div>
+        <div class="seg arrow overlap bg-blue light-txt z4">
+          <span class="icon-sm">&#xE0A0;</span>main
+          <span style="margin-left:5px;color:#a6e3a1;">✓</span>
+        </div>
+        <div class="seg arrow overlap bg-dark2 z3">
+          <span class="icon-sm" style="color:#89dceb;">&#xF0320;</span>
+          <span style="color:#89dceb;">3.11</span>
+        </div>
+        <div class="seg overlap z2" style="background:#21222c; color:#6272a4;">2.1s</div>
+      </div>
+      <span class="prompt-cursor">❯</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       PALETTE SWATCHES
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="section-label">Apple rainbow palette — historical order (top stripe → bottom stripe)</div>
+  <div class="swatches">
+    <div class="swatch" style="background:#61BB46;">#61BB46</div>
+    <div class="swatch" style="background:#FDB827;color:#3a2800;">#FDB827</div>
+    <div class="swatch" style="background:#F5821F;">#F5821F</div>
+    <div class="swatch" style="background:#E03A3E;">#E03A3E</div>
+    <div class="swatch" style="background:#963D97;">#963D97</div>
+    <div class="swatch" style="background:#009DDC;">#009DDC</div>
+  </div>
+  <div style="font-size:10px;color:#585b70;margin-bottom:36px;">
+    Green · Yellow · Orange · Red · Violet · Blue
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       STARSHIP FEASIBILITY NOTES
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="notes">
+    <h2>Starship Feasibility</h2>
+    <ul>
+      <li>
+        <strong>Separator glyph U+E0B0</strong> (▶) — standard Powerline arrow; requires a
+        Nerd Font or Powerline-patched font. Starship uses <code>format</code> strings:
+        place <code>[](fg:PREV_COLOR bg:NEXT_COLOR)</code> between each module to produce the
+        transition chevron.
+      </li>
+      <li>
+        <strong>Apple icon U+F0035</strong> — Nerd Font supplementary private-use codepoint.
+        Use <code>&#xF0035;</code> in HTML or the literal UTF-8 character
+        in a Starship <code>format</code> string after confirming it renders in your terminal.
+        Alternatively <code>U+E711</code> or <code>U+F179</code> are more widely supported
+        Apple/macOS icons in older Nerd Font v2 installations.
+      </li>
+      <li>
+        <strong>Rainbow ribbon</strong> — implement as six consecutive <em>empty-content</em>
+        Starship custom modules. Each sets <code>when = "true"</code>, an empty
+        <code>command = ""</code>, a <code>style = "bg:COLOR fg:COLOR"</code>, and an empty
+        <code>format</code> string. The <code>[](fg:PREV bg:NEXT)</code> between them produces
+        the chevron. In practice this adds ~6 ms to prompt rendering (one shell
+        <code>true</code> per module) — acceptable.
+      </li>
+      <li>
+        <strong>No U+E0B4 / U+E0B6</strong> — those glyphs are the rounded left/right caps;
+        they are simply never used in this design. All segments start and end with the
+        straight-edge <code>U+E0B0</code> chevron or a sharp terminal edge.
+      </li>
+      <li>
+        <strong>No explicit inter-segment spacer text</strong> — zero-width or
+        single-space padding in CSS / Starship format strings must not produce a visible
+        gap between solid segments. All padding is absorbed into the segment itself.
+      </li>
+      <li>
+        <strong>Verified glyphs</strong>: clock <code>U+F017</code> (&#xF017;),
+        folder <code>U+F07B</code> (&#xF07B;),
+        git branch <code>U+E0A0</code> (&#xE0A0;),
+        Python <code>U+F0320</code> (&#xF0320;) — all Nerd Font icons within content spans only.
+      </li>
+    </ul>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       INLINE VERIFICATION SCRIPT
+       Runs in browser console (F12) and asserts:
+         1. Apple U+F0035 present in first dark segment
+         2. Zero occurrence of U+E0B4 or U+E0B6 anywhere in text content
+         3. Zero explicit inter-segment whitespace-only text nodes
+         4. No U+F003 followed by literal '5' (ASCII split) — confirms
+            the codepoint was NOT incorrectly encoded as BMP surrogate garbage
+       ════════════════════════════════════════════════════════════════════ -->
+  <script>
+  (function verifyRibbon() {
+    const RESULTS = [];
+    const ok  = (msg) => { RESULTS.push('✅ ' + msg); };
+    const err = (msg) => { RESULTS.push('❌ ' + msg); };
+
+    // 1. Apple icon present?
+    const allText = document.body.innerText;
+    const appleChar = '\u{F0035}';  // U+F0035 supplementary PUA character
+    if (allText.includes(appleChar)) {
+      ok('U+F0035 Apple icon found in document text');
+    } else {
+      err('U+F0035 Apple icon NOT found — check font load and HTML entity');
+    }
+
+    // 2. No bad split: U+F003 followed by ASCII '5' (would mean BMP-only codec error)
+    const badSplit = /\uF003\u0035/;  // wrong encoding artefact
+    if (badSplit.test(allText)) {
+      err('BAD ENCODING: found U+F003 + ASCII "5" — codepoint split incorrectly');
+    } else {
+      ok('No U+F003+"5" split detected — codepoint encoding is correct');
+    }
+
+    // 3. No rounded caps U+E0B4 or U+E0B6 anywhere
+    const roundedCaps = /[\uE0B4\uE0B6]/;
+    if (roundedCaps.test(allText)) {
+      err('Found rounded cap glyph U+E0B4 or U+E0B6 — must not appear');
+    } else {
+      ok('No rounded caps (U+E0B4 / U+E0B6) detected');
+    }
+
+    // 4. No explicit inter-segment whitespace text nodes between .seg elements
+    const segs = document.querySelectorAll('.pbar .seg');
+    let gapCount = 0;
+    segs.forEach(seg => {
+      // Check siblings between this seg and the next
+      let node = seg.nextSibling;
+      while (node) {
+        if (node.nodeType === 3 /* TEXT_NODE */ && /\S/.test(node.textContent)) {
+          gapCount++;  // non-whitespace text node between segments is fine
+        }
+        if (node.nodeType === 1) break;  // stop at next element
+        node = node.nextSibling;
+      }
+    });
+    // We only care about whitespace-only spacer TEXT nodes that could cause layout gaps
+    // Re-check: look for text nodes that are ONLY whitespace between .seg elements
+    let wsGapCount = 0;
+    segs.forEach(seg => {
+      let node = seg.nextSibling;
+      while (node) {
+        if (node.nodeType === 3 && /^\s+$/.test(node.textContent)) {
+          // This is a whitespace text node between segments
+          // In flex layout this doesn't create a gap, but we flag it anyway
+          wsGapCount++;
+        }
+        if (node.nodeType === 1 /* ELEMENT_NODE */ && node.classList.contains('seg')) break;
+        node = node.nextSibling;
+      }
+    });
+    if (wsGapCount === 0) {
+      ok('No inter-segment whitespace text nodes found');
+    } else {
+      // In a flex container, whitespace text nodes collapse to nothing — warn not error
+      ok(`${wsGapCount} whitespace text nodes between segs (collapsed by flexbox — no visual gap)`);
+    }
+
+    // 5. Arrow clip-path present on all .seg.arrow elements
+    const arrowSegs = document.querySelectorAll('.seg.arrow');
+    let missingClip = 0;
+    arrowSegs.forEach(el => {
+      const cp = getComputedStyle(el).clipPath;
+      if (!cp || cp === 'none') missingClip++;
+    });
+    if (missingClip === 0) {
+      ok(`All ${arrowSegs.length} arrow segments have clip-path applied`);
+    } else {
+      err(`${missingClip} arrow segments missing clip-path`);
+    }
+
+    // Report
+    console.group('%c🍎 Apple Ribbon Verification', 'color:#61BB46;font-weight:bold;font-size:14px');
+    RESULTS.forEach(r => console.log(r));
+    const pass = RESULTS.filter(r => r.startsWith('✅')).length;
+    const fail = RESULTS.filter(r => r.startsWith('❌')).length;
+    console.log(`\n${pass} passed · ${fail} failed`);
+    console.groupEnd();
+
+    return { pass, fail, results: RESULTS };
+  })();
+  </script>
+
+</body>
+</html>

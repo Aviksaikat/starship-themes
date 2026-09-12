@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>starship-theme · weird/neon concept gallery</title>
+<style>
+  /* ── Reset ──────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Tokens ─────────────────────────────────────────────── */
+  :root {
+    --page-bg:     #0a0a0a;
+    --page-fg:     #c9c9c9;
+    --card-border: rgba(255,255,255,.07);
+    --font-mono:   "CaskaydiaCove Nerd Font", "Symbols Nerd Font", "MesloLGS NF",
+                   "Fira Code", "JetBrains Mono", "Cascadia Code", monospace;
+  }
+
+  body {
+    background: var(--page-bg);
+    color: var(--page-fg);
+    font-family: var(--font-mono);
+    padding: 36px 28px 64px;
+    min-height: 100vh;
+    transition: background .25s, color .25s;
+  }
+  body.light {
+    --page-bg:     #1c1c1e;
+    --page-fg:     #e0e0e0;
+    --card-border: rgba(255,255,255,.1);
+  }
+
+  /* ── Page header ─────────────────────────────────────────── */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 44px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .page-title { font-size: 13px; line-height: 1.5; color: #888; }
+  .page-title strong { color: #ddd; font-size: 16px; display: block; margin-bottom: 4px; }
+  .page-subtitle { font-size: 11px; color: #555; margin-top: 2px; }
+
+  /* ── Background toggle ───────────────────────────────────── */
+  #bg-toggle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: transparent;
+    border: 1px solid #333;
+    color: #888;
+    border-radius: 5px;
+    padding: 5px 12px;
+    cursor: pointer;
+    letter-spacing: .3px;
+    transition: border-color .2s, color .2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #bg-toggle:hover { border-color: #666; color: #ccc; }
+
+  /* ── Theme sections ──────────────────────────────────────── */
+  .themes { display: flex; flex-direction: column; gap: 56px; }
+
+  .theme-section {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .theme-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .theme-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+  }
+  .theme-name .tag {
+    font-size: 10px;
+    font-weight: 500;
+    color: #666;
+    margin-left: 10px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .theme-name .grammar-tag {
+    font-size: 10px;
+    font-weight: 500;
+    color: #444;
+    margin-left: 8px;
+    letter-spacing: .5px;
+    vertical-align: middle;
+    border: 1px solid #333;
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+  .theme-tagline {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+  }
+  .theme-bg-label {
+    font-size: 10px;
+    color: #555;
+    text-align: right;
+    padding-top: 2px;
+  }
+  .theme-bg-label code {
+    font-family: var(--font-mono);
+    color: #888;
+  }
+
+  /* ── Prompt preview area ─────────────────────────────────── */
+  .prompt-area {
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .prompt-area-title {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: 14px;
+  }
+
+  .terminal-window {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .terminal-titlebar {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 6px;
+    background: #1a1a1a;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #28c840; }
+
+  .terminal-body {
+    padding: 14px 18px 18px;
+    line-height: 1.7;
+  }
+  .terminal-body pre {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    white-space: pre;
+    margin-bottom: 2px;
+  }
+  .terminal-body .row-label {
+    font-size: 9px;
+    color: #444;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 3px;
+  }
+  .terminal-body .row-label:first-child { margin-top: 0; }
+
+  /* ── Palette swatches ────────────────────────────────────── */
+  .palette-area {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .palette-area-title {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: 12px;
+  }
+  .swatches {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .swatch-block {
+    width: 48px;
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .swatch-label {
+    font-size: 9px;
+    color: #555;
+    text-align: center;
+  }
+  .swatch-hex {
+    font-size: 9px;
+    color: #777;
+    font-family: var(--font-mono);
+  }
+  .swatch-role {
+    font-size: 8px;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+
+  /* ── Rationale ───────────────────────────────────────────── */
+  .rationale-area {
+    padding: 16px 24px 20px;
+  }
+  .rationale-area-title {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: 10px;
+  }
+  .rationale-area p {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.7;
+    max-width: 780px;
+  }
+  .rationale-area ul {
+    list-style: none;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.7;
+    margin-top: 6px;
+    padding: 0;
+  }
+  .rationale-area li::before { content: "→ "; color: #444; }
+
+  /* ── Section dividers ────────────────────────────────────── */
+  .diff-note {
+    font-size: 10px;
+    color: #3a3a3a;
+    text-align: center;
+    font-style: italic;
+    margin: 0 24px;
+    padding: 8px 0;
+    border-top: 1px solid var(--card-border);
+  }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  .page-footer {
+    margin-top: 48px;
+    font-size: 10px;
+    color: #3a3a3a;
+    text-align: center;
+    line-height: 1.8;
+  }
+  .page-footer a { color: #555; text-decoration: none; }
+
+  /* ── Chip helpers ────────────────────────────────────────── */
+  /* Segments are pure contiguous inline <span>s — no leading cap, no gaps.
+     Separator spans carry fg=departing-chip-bg / bg=arriving-chip-bg.
+     Tail separators have no bg (terminal shows through). */
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     Page header
+════════════════════════════════════════════════════════════ -->
+<header class="page-header">
+  <div class="page-title">
+    <strong>starship-theme · weird/neon concepts</strong>
+    <span>Three palette candidates — Acid Orchid · Laser Koi · Radioactive Candy</span>
+    <div class="page-subtitle">sketches/001-weird-neon &nbsp;·&nbsp; disposable exploration &nbsp;·&nbsp; do not ship as-is</div>
+  </div>
+  <button id="bg-toggle" onclick="document.body.classList.toggle('light')">toggle bg</button>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     THEME 1 — ACID ORCHID
+     UV black-light aesthetic: chartreuse + orchid fuchsia + acid lime
+     Background: #0a0612 (near-black violet)
+     Separator grammar: pixel-fade U+E0C6 (×2) — contiguous, no leading cap
+════════════════════════════════════════════════════════════ -->
+<div class="themes">
+
+<section class="theme-section" id="acid-orchid">
+  <div class="theme-header">
+    <div>
+      <div class="theme-name" style="color:#b5ff2b">
+        Acid Orchid
+        <span class="tag">concept 01</span>
+        <span class="grammar-tag">pixel-fade &#xE0C6;&#xE0C6;</span>
+      </div>
+      <div class="theme-tagline">UV black-light rave palette — chartreuse, fuchsia orchid, acid lime. Zero blue, zero pink-red overlap with vaporwave.</div>
+    </div>
+    <div class="theme-bg-label">
+      background<br><code>#0a0612</code>
+    </div>
+  </div>
+
+  <div class="prompt-area">
+    <div class="prompt-area-title">prompt preview</div>
+    <div class="terminal-window">
+      <div class="terminal-titlebar">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+      </div>
+      <div class="terminal-body" style="background:#0a0612">
+
+        <span class="row-label">clean repo</span>
+        <pre><span style="color:#0a0612;background:#b5ff2b"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#b5ff2b;background:#d946ef">&#xE0C6;&#xE0C6;</span><span style="color:#0a0612;background:#d946ef"> main</span><span style="color:#d946ef">&#xE0C6;&#xE0C6;</span><span style="color:#b5ff2b;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">dirty repo</span>
+        <pre><span style="color:#0a0612;background:#b5ff2b"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#b5ff2b;background:#d946ef">&#xE0C6;&#xE0C6;</span><span style="color:#0a0612;background:#d946ef"> main </span><span style="color:#f59e0b;background:#d946ef">!</span><span style="color:#d946ef">&#xE0C6;&#xE0C6;</span><span style="color:#b5ff2b;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">python project · dirty</span>
+        <pre><span style="color:#0a0612;background:#b5ff2b"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#b5ff2b;background:#d946ef">&#xE0C6;&#xE0C6;</span><span style="color:#0a0612;background:#d946ef"> main </span><span style="color:#f59e0b;background:#d946ef">!</span><span style="color:#d946ef;background:#a3e635">&#xE0C6;&#xE0C6;</span><span style="color:#0a0612;background:#a3e635"> 🐍 v3.12.4</span><span style="color:#a3e635">&#xE0C6;&#xE0C6;</span><span style="color:#b5ff2b;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">non-git dir · python</span>
+        <pre><span style="color:#0a0612;background:#b5ff2b"> &#xF0035; …/Documents/ml-experiment</span><span style="color:#b5ff2b;background:#a3e635">&#xE0C6;&#xE0C6;</span><span style="color:#0a0612;background:#a3e635"> 🐍 v3.12.4</span><span style="color:#a3e635">&#xE0C6;&#xE0C6;</span><span style="color:#b5ff2b;font-weight:700"> ❯</span></pre>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-area">
+    <div class="palette-area-title">palette</div>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="swatch-block" style="background:#0a0612"></div>
+        <div class="swatch-hex">#0a0612</div>
+        <div class="swatch-role">base</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#b5ff2b"></div>
+        <div class="swatch-hex">#b5ff2b</div>
+        <div class="swatch-role">path / ❯</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#d946ef"></div>
+        <div class="swatch-hex">#d946ef</div>
+        <div class="swatch-role">git branch</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#a3e635"></div>
+        <div class="swatch-hex">#a3e635</div>
+        <div class="swatch-role">language</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#f59e0b"></div>
+        <div class="swatch-hex">#f59e0b</div>
+        <div class="swatch-role">dirty / warn</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rationale-area">
+    <div class="rationale-area-title">rationale</div>
+    <p>UV black-light rave atmosphere. The near-black violet base (<code style="color:#888">#0a0612</code>) is warmer and more
+    distinctive than the flat blacks used by vaporwave/cyber-tokyo. The chartreuse
+    (<code style="color:#888">#b5ff2b</code>) used for the path chip is the defining hue — it evokes acid house fluorescents
+    and is genuinely unique across all current themes. Fuchsia orchid (<code style="color:#888">#d946ef</code>) for the git
+    branch has orchid's name directly, and sits far enough from vaporwave's hot-pink (<code style="color:#888">#ff71ce</code>)
+    to read as a different emotion. Acid lime (<code style="color:#888">#a3e635</code>) for Python keeps the green family but
+    at a higher chroma than any current lang colour. Separator: pixel-fade <code style="color:#888">U+E0C6</code> doubled for
+    a decay shimmer between segments — segments butt directly with no gap or cap.</p>
+    <ul>
+      <li>No blue hues anywhere — total break from the blue-heavy current roster</li>
+      <li>Chip text is the base background itself, so the "dark text inside" contract holds</li>
+      <li>Amber dirty indicator avoids green family clash with lime lang chip</li>
+      <li>Double pixel separator reads as a dissolve edge, fitting the acid-rave aesthetic</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     THEME 2 — LASER KOI
+     Deep ocean + koi orange + bioluminescent teal + hot magenta
+     Background: #04080f (abyssal near-black with ocean blue cast)
+     Separator grammar: triple standard chevron U+E0B0 (×3)
+════════════════════════════════════════════════════════════ -->
+<section class="theme-section" id="laser-koi">
+  <div class="theme-header">
+    <div>
+      <div class="theme-name" style="color:#ff6b35">
+        Laser Koi
+        <span class="tag">concept 02</span>
+        <span class="grammar-tag">triple-chevron &#xE0B0;&#xE0B0;&#xE0B0;</span>
+      </div>
+      <div class="theme-tagline">Japanese koi in a deep dark pond, lit by lasers — warm orange, bioluminescent teal, magenta. No purple, no cyan-blue overlap.</div>
+    </div>
+    <div class="theme-bg-label">
+      background<br><code>#04080f</code>
+    </div>
+  </div>
+
+  <div class="prompt-area">
+    <div class="prompt-area-title">prompt preview</div>
+    <div class="terminal-window">
+      <div class="terminal-titlebar">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+      </div>
+      <div class="terminal-body" style="background:#04080f">
+
+        <span class="row-label">clean repo</span>
+        <pre><span style="color:#04080f;background:#ff6b35"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#ff6b35;background:#00e5cc">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#04080f;background:#00e5cc"> main</span><span style="color:#00e5cc">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#ff6b35;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">dirty repo</span>
+        <pre><span style="color:#04080f;background:#ff6b35"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#ff6b35;background:#00e5cc">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#04080f;background:#00e5cc"> main </span><span style="color:#ffd60a;background:#00e5cc">!</span><span style="color:#00e5cc">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#ff6b35;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">python project · dirty</span>
+        <pre><span style="color:#04080f;background:#ff6b35"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#ff6b35;background:#00e5cc">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#04080f;background:#00e5cc"> main </span><span style="color:#ffd60a;background:#00e5cc">!</span><span style="color:#00e5cc;background:#f72585">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#04080f;background:#f72585"> 🐍 v3.12.4</span><span style="color:#f72585">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#ff6b35;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">non-git dir · python</span>
+        <pre><span style="color:#04080f;background:#ff6b35"> &#xF0035; …/Documents/ml-experiment</span><span style="color:#ff6b35;background:#f72585">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#04080f;background:#f72585"> 🐍 v3.12.4</span><span style="color:#f72585">&#xE0B0;&#xE0B0;&#xE0B0;</span><span style="color:#ff6b35;font-weight:700"> ❯</span></pre>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-area">
+    <div class="palette-area-title">palette</div>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="swatch-block" style="background:#04080f"></div>
+        <div class="swatch-hex">#04080f</div>
+        <div class="swatch-role">base</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#ff6b35"></div>
+        <div class="swatch-hex">#ff6b35</div>
+        <div class="swatch-role">path / ❯</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#00e5cc"></div>
+        <div class="swatch-hex">#00e5cc</div>
+        <div class="swatch-role">git branch</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#f72585"></div>
+        <div class="swatch-hex">#f72585</div>
+        <div class="swatch-role">language</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#ffd60a"></div>
+        <div class="swatch-hex">#ffd60a</div>
+        <div class="swatch-role">dirty / warn</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rationale-area">
+    <div class="rationale-area-title">rationale</div>
+    <p>Koi fish live in still dark water; under laser light their
+    orange-red bodies glow against the black. The <em>abyssal</em> background (<code style="color:#888">#04080f</code>)
+    is darker and bluer-tinged than even material-ocean, making chips appear to
+    <em>float</em>. Koi orange (<code style="color:#888">#ff6b35</code>) for the path chip is warmer than any existing
+    theme — a completely unoccupied hue band in the current roster. Bioluminescent
+    teal (<code style="color:#888">#00e5cc</code>) for git is clearly distinct from vaporwave's cyan-blue
+    (<code style="color:#888">#01cdfe</code>) because it leans green rather than blue. Hot magenta
+    (<code style="color:#888">#f72585</code>) for Python is the most saturated deep-pink available without
+    merging into vaporwave's hot-pink. Separator: three consecutive standard
+    chevrons <code style="color:#888">U+E0B0</code> — the triple run reads as a speed streak, like laser light
+    slicing water.</p>
+    <ul>
+      <li>Only theme using orange in the path role — immediately distinctive at a glance</li>
+      <li>Gold dirty indicator harmonises with the warm-orange family without clashing</li>
+      <li>Highest contrast theme on very dark backgrounds (abyssal base + saturated chips)</li>
+      <li>Triple chevron creates directional momentum, reinforcing the "laser" motion metaphor</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     THEME 3 — RADIOACTIVE CANDY
+     Irradiated candy store: neon green + candy pink + electric yellow
+     Background: #0e0e0e (neutral near-black)
+     Separator grammar: Lego/block U+E0CE (×1) — chunky single block
+════════════════════════════════════════════════════════════ -->
+<section class="theme-section" id="radioactive-candy">
+  <div class="theme-header">
+    <div>
+      <div class="theme-name" style="color:#39ff14">
+        Radioactive Candy
+        <span class="tag">concept 03</span>
+        <span class="grammar-tag">lego-block &#xE0CE;</span>
+      </div>
+      <div class="theme-tagline">Neon green + candy pink + electric yellow on pure black — maximum punch. An irradiated candy store, no apologies.</div>
+    </div>
+    <div class="theme-bg-label">
+      background<br><code>#0e0e0e</code>
+    </div>
+  </div>
+
+  <div class="prompt-area">
+    <div class="prompt-area-title">prompt preview</div>
+    <div class="terminal-window">
+      <div class="terminal-titlebar">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+      </div>
+      <div class="terminal-body" style="background:#0e0e0e">
+
+        <span class="row-label">clean repo</span>
+        <pre><span style="color:#0e0e0e;background:#39ff14"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#39ff14;background:#ff3cac">&#xE0CE;</span><span style="color:#0e0e0e;background:#ff3cac"> main</span><span style="color:#ff3cac">&#xE0CE;</span><span style="color:#39ff14;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">dirty repo</span>
+        <pre><span style="color:#0e0e0e;background:#39ff14"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#39ff14;background:#ff3cac">&#xE0CE;</span><span style="color:#0e0e0e;background:#ff3cac"> main </span><span style="color:#ff6d00;background:#ff3cac">!</span><span style="color:#ff3cac">&#xE0CE;</span><span style="color:#39ff14;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">python project · dirty</span>
+        <pre><span style="color:#0e0e0e;background:#39ff14"> &#xF0035; …/git_projects/github/starship-theme</span><span style="color:#39ff14;background:#ff3cac">&#xE0CE;</span><span style="color:#0e0e0e;background:#ff3cac"> main </span><span style="color:#ff6d00;background:#ff3cac">!</span><span style="color:#ff3cac;background:#ffea00">&#xE0CE;</span><span style="color:#0e0e0e;background:#ffea00"> 🐍 v3.12.4</span><span style="color:#ffea00">&#xE0CE;</span><span style="color:#39ff14;font-weight:700"> ❯</span></pre>
+
+        <span class="row-label">non-git dir · python</span>
+        <pre><span style="color:#0e0e0e;background:#39ff14"> &#xF0035; …/Documents/ml-experiment</span><span style="color:#39ff14;background:#ffea00">&#xE0CE;</span><span style="color:#0e0e0e;background:#ffea00"> 🐍 v3.12.4</span><span style="color:#ffea00">&#xE0CE;</span><span style="color:#39ff14;font-weight:700"> ❯</span></pre>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-area">
+    <div class="palette-area-title">palette</div>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="swatch-block" style="background:#0e0e0e;border-color:rgba(255,255,255,.2)"></div>
+        <div class="swatch-hex">#0e0e0e</div>
+        <div class="swatch-role">base</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#39ff14"></div>
+        <div class="swatch-hex">#39ff14</div>
+        <div class="swatch-role">path / ❯</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#ff3cac"></div>
+        <div class="swatch-hex">#ff3cac</div>
+        <div class="swatch-role">git branch</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#ffea00"></div>
+        <div class="swatch-hex">#ffea00</div>
+        <div class="swatch-role">language</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-block" style="background:#ff6d00"></div>
+        <div class="swatch-hex">#ff6d00</div>
+        <div class="swatch-role">dirty / warn</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rationale-area">
+    <div class="rationale-area-title">rationale</div>
+    <p>The most <em>maximalist</em> candidate. Pure neon green (<code style="color:#888">#39ff14</code>) is the canonical
+    radioactive / UV-reactor colour — it appears nowhere else in the theme set.
+    Candy pink (<code style="color:#888">#ff3cac</code>) for git has higher chroma and cooler undertone than
+    vaporwave's hot-pink or cyber-tokyo's neon-red, keeping it meaningfully distinct.
+    Electric yellow (<code style="color:#888">#ffea00</code>) for Python is the only theme using yellow in a chip role
+    — zero risk of confusion. The neutral pure-black base (<code style="color:#888">#0e0e0e</code>) provides maximum
+    contrast for all three saturated chip colours, and avoids the coloured-tinge bases
+    used by the other two concepts here. Separator: single Lego/block glyph
+    <code style="color:#888">U+E0CE</code> — the chunky block snap reads like candy snapping apart, and its
+    visual weight holds the maximalist palette together.</p>
+    <ul>
+      <li>Only theme with neon green — the single most unambiguous radioactive signal</li>
+      <li>Electric yellow lang chip reads differently from green path chip at a glance</li>
+      <li>Nuclear orange dirty indicator ties the "hazardous" metaphor together</li>
+      <li>Single lego block: deliberately bold, cuts through the loud colour without overcomplicating</li>
+      <li>Risk: the most aggressive of the three; may polarise — recommend offering as an opt-in</li>
+    </ul>
+  </div>
+</section>
+
+</div><!-- /.themes -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     Footer
+════════════════════════════════════════════════════════════ -->
+<footer class="page-footer">
+  <p>starship-theme · sketches/001-weird-neon · disposable exploration only</p>
+  <p style="margin-top:4px">Existing production themes: vaporwave, cyber-tokyo, dracula-classic, tokyo-night-minimal, tokyo-night-neo, catppuccin-*, nord-frost, gruvbox-ember, material-ocean, arch-os, ccswe-dark, midnight-bloom</p>
+  <p style="margin-top:4px;color:#2a2a2a">No external deps · Nerd Font stack · three separator grammars: pixel-fade (&#xE0C6;&#xE0C6;) · triple-chevron (&#xE0B0;&#xE0B0;&#xE0B0;) · lego-block (&#xE0CE;) · no rounded caps · no gaps</p>
+</footer>
+
+<script>
+  // Persist toggle state across reload
+  (function () {
+    var stored = localStorage.getItem('bg');
+    if (stored === 'light') document.body.classList.add('light');
+    document.getElementById('bg-toggle').addEventListener('click', function () {
+      localStorage.setItem('bg', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+  })();
+</script>
+</body>
+</html>

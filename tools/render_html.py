@@ -14,7 +14,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, "docs", "preview.html")
 
+# SGR sequences only: ESC [ <params> m  (colours, bold, reset)
 ESC = re.compile(r"\x1b\[([0-9;]*)m")
+
+# Any other CSI sequence: ESC [ <params> <final-byte-that-is-not-m>
+# These include ESC[J (erase display), ESC[H (cursor home), ESC[2J, etc.
+# They must be stripped so they never leak as literal "[J" into the HTML.
+#
+# CSI final bytes are A-Z and a-z (plus some punctuation).  SGR ends in 'm'
+# (lowercase).  Pattern: all uppercase A-Z + all lowercase except 'm'.
+# [A-Za-ln-z] = A-Z (all uppercase) + a-l + n-z (all lowercase minus 'm').
+_NON_SGR_CSI = re.compile(r"\x1b\[[0-9;]*[A-Za-ln-z@`]")
 
 
 def hexof(r, g, b):
@@ -22,8 +32,17 @@ def hexof(r, g, b):
 
 
 def ansi_to_html(s):
-    """Convert an ANSI string (starship output) to HTML spans."""
+    """Convert an ANSI string (starship output) to HTML spans.
+
+    Non-SGR CSI sequences (ESC[J, ESC[2J, ESC[H, …) are stripped first so they
+    never appear as literal control-sequence remnants in the output.
+    SGR colour and reset sequences are faithfully converted to <span> elements.
+    """
+    # 1. Strip zsh prompt wrappers.
     s = s.replace("%{", "").replace("%}", "")
+    # 2. Strip non-SGR CSI sequences BEFORE any further processing.
+    s = _NON_SGR_CSI.sub("", s)
+
     out, pos = [], 0
     state = {"fg": None, "bg": None, "bold": False, "open": False}
 
@@ -73,6 +92,37 @@ def ansi_to_html(s):
     emit(s[pos:])
     close()
     return "".join(out)
+
+
+def _self_test():
+    """Regression tests for ansi_to_html — run automatically at import time."""
+    # Non-SGR CSI sequences must never appear as literal bracket-letter remnants.
+    assert "[J" not in ansi_to_html("\x1b[J hello"), \
+        "ESC[J leaked as literal '[J'"
+    assert "[J" not in ansi_to_html("\x1b[2J hello"), \
+        "ESC[2J leaked as literal '[J'"
+    assert "[H" not in ansi_to_html("\x1b[H hello"), \
+        "ESC[H leaked as literal '[H'"
+    # ESC[K (erase line) must also be stripped.
+    assert "[K" not in ansi_to_html("\x1b[K hello"), \
+        "ESC[K leaked as literal '[K'"
+
+    # SGR colour sequences must survive and produce correct hex values.
+    result = ansi_to_html("\x1b[38;2;100;200;50m hello\x1b[0m")
+    assert "color:#64c832" in result, \
+        f"SGR fg colour lost; got: {result!r}"
+    assert "hello" in result, "text content lost"
+
+    bg_result = ansi_to_html("\x1b[48;2;30;40;50m bg\x1b[0m")
+    assert "background:#1e2832" in bg_result, \
+        f"SGR bg colour lost; got: {bg_result!r}"
+
+    # Mixed: non-SGR before SGR — colour must survive, non-SGR must vanish.
+    mixed = ansi_to_html("\x1b[J\x1b[38;2;255;0;0m red\x1b[0m")
+    assert "[J" not in mixed, "ESC[J survived mixed input"
+    assert "color:#ff0000" in mixed, "SGR colour lost in mixed input"
+
+    print("render_html self-test: all assertions passed")
 
 
 def palette_of(text):
@@ -131,6 +181,9 @@ def main():
         fh.write(html)
     print("wrote", os.path.relpath(OUT, ROOT))
 
+
+# Run self-test whenever this module is loaded (import or direct run).
+_self_test()
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,7 @@ command_timeout = 20
 
 format = "$directory$git_branch$git_status$c$rust$golang$nodejs$python$cmd_duration$line_break$character"
 
-palette = "vaporwave"
+palette = "ninetailedstarship-latte"
 
 # --- path -------------------------------------------------------------------
 [directory]
@@ -49,9 +49,9 @@ min_time = 1000
 success_symbol = "[❯](bold fg:color_path)"
 error_symbol = "[❯](bold red)"
 
-[palettes.vaporwave]
-color_path = "#b967ff"
-color_git = "#ff71ce"
-color_lang = "#01cdfe"
-color_time = "#6c7086"
-base = "#1a1b26"
+[palettes.ninetailedstarship-latte]
+color_path = "#179299"
+color_git = "#8839ef"
+color_lang = "#40a02b"
+color_time = "#6c6f85"
+base = "#eff1f5"
