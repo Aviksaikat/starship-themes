@@ -1,0 +1,104 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Port of OMP hunk theme.
+# Left: OS+path (pink/rose) → node/python (light pink) → git (lime)
+# Right: duration → user → shell
+add_newline = false
+command_timeout = 200
+palette = 'hunk'
+
+format = """
+[](fg:rose)\
+$os\
+$directory\
+[](fg:rose bg:lightpink)\
+$nodejs\
+$python\
+[](fg:lightpink bg:lime)\
+$git_branch\
+$git_status\
+[](fg:lime)\
+$fill\
+[](fg:purple)\
+$cmd_duration\
+[](fg:purple bg:steel)\
+$username\
+[](fg:steel bg:blue)\
+$shell\
+[](fg:blue)\
+$line_break\
+$character"""
+
+[palettes.hunk]
+rose      = '#c44569'
+lightpink = '#f78fb3'
+lime      = '#caffbf'
+purple    = '#83769c'
+steel     = '#86BBD8'
+blue      = '#33658A'
+white     = '#ffffff'
+dark      = '#333333'
+
+[fill]
+symbol = ' '
+
+[os]
+disabled = false
+style    = 'fg:white bg:rose'
+format   = '[ $symbol ]($style)'
+
+[os.symbols]
+Macos   = '󰀵'
+Linux   = '󰌽'
+Arch    = '󰣇'
+Ubuntu  = '󰕈'
+Windows = '󰍲'
+
+[directory]
+style             = 'bold fg:white bg:rose'
+format            = '[ $path ]($style)'
+truncation_length = 3
+truncation_symbol = '…/'
+
+[nodejs]
+symbol = ' '
+style  = 'fg:white bg:lightpink'
+format = '[ $symbol$version ]($style)'
+
+[python]
+symbol           = ' '
+style            = 'fg:white bg:lightpink'
+format           = '[ $symbol$version ]($style)'
+pyenv_version_name = false
+
+[git_branch]
+symbol = ''
+style  = 'fg:dark bg:lime'
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style    = 'fg:dark bg:lime'
+format   = '[$all_status$ahead_behind ]($style)'
+
+[cmd_duration]
+min_time = 500
+style    = 'fg:white bg:purple'
+format   = '[ ⏱ $duration ]($style)'
+
+[username]
+show_always = true
+style_user  = 'fg:white bg:steel'
+style_root  = 'fg:white bg:steel'
+format      = '[ $user ]($style)'
+
+[shell]
+disabled       = false
+zsh_indicator  = 'zsh'
+fish_indicator = 'fish'
+bash_indicator = 'bash'
+style          = 'fg:white bg:blue'
+format         = '[ $indicator ]($style)'
+
+[character]
+success_symbol = '[  ❯](bold fg:#69FF94)'
+error_symbol   = '[  ❯](bold fg:red)'

@@ -1,0 +1,108 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Port of OMP iterm2 theme.
+# Left: OS → user → path → git → status
+# Right: battery · python · time
+add_newline = false
+command_timeout = 200
+palette = 'iterm2'
+
+format = """
+[](fg:dark)\
+$os\
+$username\
+[](fg:dark bg:cobalt)\
+$directory\
+[](fg:cobalt bg:lime)\
+$git_branch\
+$git_status\
+[](fg:lime bg:green)\
+$status\
+[](fg:green)\
+$fill\
+[](fg:orange)\
+$battery\
+[](fg:orange bg:cobalt)\
+$python\
+[](fg:cobalt bg:dark)\
+$time\
+[](fg:dark)\
+$line_break\
+$character"""
+
+[palettes.iterm2]
+dark   = '#003543'
+cobalt = '#0087D8'
+lime   = '#d2ff5e'
+green  = '#33DD2D'
+orange = '#f36943'
+dark2  = '#242424'
+white  = '#ffffff'
+
+[fill]
+symbol = ' '
+
+[os]
+disabled = false
+style    = 'fg:white bg:dark'
+format   = '[ $symbol ]($style)'
+
+[os.symbols]
+Macos   = '󰀵'
+Linux   = '󰌽'
+Arch    = '󰣇'
+Ubuntu  = '󰕈'
+Windows = '󰍲'
+
+[username]
+show_always = true
+style_user  = 'fg:lime bg:dark'
+style_root  = 'fg:lime bg:dark'
+format      = '[ $user ]($style)'
+
+[directory]
+style             = 'bold fg:dark bg:cobalt'
+format            = '[ 󰀵 $path ]($style)'
+truncation_length = 3
+truncation_symbol = '…/'
+
+[git_branch]
+symbol = ''
+style  = 'fg:dark bg:lime'
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style    = 'fg:dark bg:lime'
+format   = '[$all_status$ahead_behind ]($style)'
+
+[status]
+disabled = false
+style    = 'fg:dark2 bg:green'
+format   = '[ $symbol ]($style)'
+symbol   = ' '
+success_symbol = ' '
+
+[battery]
+full_symbol        = '🔋'
+charging_symbol    = '⚡'
+discharging_symbol = '💀'
+format             = '[$symbol$percentage ]($style)'
+
+[[battery.display]]
+threshold = 100
+style     = 'fg:dark2 bg:orange'
+
+[python]
+symbol  = ' '
+style   = 'fg:dark bg:cobalt'
+format  = '[ $symbol$virtualenv ]($style)'
+
+[time]
+disabled    = false
+time_format = '%H:%M'
+style       = 'fg:white bg:dark'
+format      = '[  $time ]($style)'
+
+[character]
+success_symbol = '[ 🚀](bold)'
+error_symbol   = '[ 🚀](bold fg:red)'

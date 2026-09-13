@@ -187,6 +187,21 @@ palettes.
 
 ---
 
+# Part 4 — Oh My Posh ports
+
+Five themes ported from the oh-my-posh theme gallery with faithful colour and
+layout mapping.
+
+| Theme | Preview |
+|---|---|
+| **cobalt2** | ![cobalt2](media/png/cobalt2.png) |
+| **emodipt-extend** | ![emodipt-extend](media/png/emodipt-extend.png) |
+| **hunk** | ![hunk](media/png/hunk.png) |
+| **iterm2** | ![iterm2](media/png/iterm2.png) |
+| **tiwahu** | ![tiwahu](media/png/tiwahu.png) |
+
+---
+
 ## Install
 
 ```bash
@@ -273,7 +288,7 @@ Two checks exist because the obvious one is not enough:
 
 ```
 starship-theme/
-├── themes/          # 48 .toml themes
+├── themes/          # 52 .toml themes
 ├── media/png/       # VHS screenshots (one per theme)
 ├── tapes/           # VHS tape files used to generate screenshots
 ├── tools/

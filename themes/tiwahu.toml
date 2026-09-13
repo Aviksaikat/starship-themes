@@ -1,0 +1,163 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Port of OMP tiwahu theme.
+# Multi-line:
+# L1: (optional az) duration · status · root-flag · os+user · path · languages...
+# L2: git (warm terra pill)
+# L3: shell name as plain text
+add_newline = false
+command_timeout = 200
+palette = 'tiwahu'
+
+format = """
+$cmd_duration\
+$status\
+$sudo\
+$os\
+$username\
+$directory\
+$nodejs\
+$python\
+$rust\
+$golang\
+$java\
+$kotlin\
+$dotnet\
+$php\
+$ruby\
+$swift\
+$docker_context\
+$line_break\
+$git_branch\
+$git_status\
+$line_break\
+$shell\
+$character"""
+
+[palettes.tiwahu]
+darkbg  = '#2b2b2b'
+midgray = '#444444'
+terra   = '#983e18'
+terrafg = '#f7e7d3'
+azure   = '#007ACC'
+gray    = '#888888'
+bright  = '#cccccc'
+white   = '#ffffff'
+
+[os]
+disabled = false
+style    = 'fg:gray bg:darkbg'
+format   = '[ $symbol ]($style)'
+
+[os.symbols]
+Macos   = '󰀵'
+Linux   = '󰌽'
+Arch    = '󰣇'
+Ubuntu  = '󰕈'
+Windows = '󰍲'
+
+[username]
+show_always = true
+style_user  = 'fg:gray bg:darkbg'
+style_root  = 'fg:gray bg:darkbg'
+format      = '[ $user ]($style)'
+
+[directory]
+style             = 'fg:bright bg:midgray'
+format            = '[ $path ]($style)'
+truncation_length = 4
+truncation_symbol = '…/'
+
+[nodejs]
+symbol = ' '
+style  = 'fg:white bg:#339933'
+format = '[ $symbol ]($style)'
+
+[python]
+symbol = ' '
+style  = 'fg:#ffd43b bg:#306998'
+format = '[ $symbol ]($style)'
+
+[rust]
+symbol = ' '
+style  = 'fg:#d34516 bg:#1e2650'
+format = '[ $symbol ]($style)'
+
+[golang]
+symbol = ' '
+style  = 'fg:white bg:#00add8'
+format = '[ $symbol ]($style)'
+
+[java]
+symbol = ' '
+style  = 'fg:white bg:#ED8B00'
+format = '[ $symbol ]($style)'
+
+[kotlin]
+symbol = ' '
+style  = 'fg:white bg:#7F52FF'
+format = '[ $symbol ]($style)'
+
+[dotnet]
+symbol = '󰪮 '
+style  = 'fg:white bg:#512bd4'
+format = '[ $symbol ]($style)'
+
+[php]
+symbol = ' '
+style  = 'fg:white bg:#777BB4'
+format = '[ $symbol ]($style)'
+
+[ruby]
+symbol = ' '
+style  = 'fg:white bg:#CC342D'
+format = '[ $symbol ]($style)'
+
+[swift]
+symbol = ' '
+style  = 'fg:white bg:#F05138'
+format = '[ $symbol ]($style)'
+
+[docker_context]
+symbol = ' '
+style  = 'fg:white bg:#1d63ed'
+format = '[ $symbol$context ]($style)'
+
+[git_branch]
+symbol = ''
+style  = 'fg:terrafg bg:terra'
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style    = 'fg:terrafg bg:terra'
+format   = '[$all_status$ahead_behind ]($style)'
+
+[cmd_duration]
+min_time = 500
+style    = 'fg:#222222 bg:azure'
+format   = '[ ⏱$duration ]($style)'
+
+[status]
+disabled = false
+style    = 'fg:#ff8888 bg:#880000'
+format   = '[$status ]($style)'
+not_executable_symbol = '!'
+not_found_symbol = '?'
+
+[sudo]
+disabled = false
+style    = 'fg:#2b2b2b bg:#ffcc88'
+symbol   = ''
+format   = '[$symbol ]($style)'
+
+[shell]
+disabled       = false
+zsh_indicator  = 'zsh'
+fish_indicator = 'fish'
+bash_indicator = 'bash'
+style          = 'fg:azure'
+format         = '[$indicator ](bold $style)'
+
+[character]
+success_symbol = '[❯](bold fg:azure)'
+error_symbol   = '[❯](bold fg:red)'
