@@ -156,12 +156,7 @@ CAT_OVERRIDES = {
 # 4. gruvbox_rainbow — palette keys: fg0 bg1 bg3 blue aqua green orange purple red yellow
 # ---------------------------------------------------------------------------
 GRUVBOX_OVERRIDES = {
-    "gruvbox-material": {
-        "color_fg0": "#ddc7a1", "color_bg1": "#32302f", "color_bg3": "#5a524c",
-        "color_blue": "#7daea3", "color_aqua": "#89b482", "color_green": "#a9b665",
-        "color_orange": "#e78a4e", "color_purple": "#d3869b", "color_red": "#ea6962",
-        "color_yellow": "#d8a657",
-    },
+
     "gruvbox-light": {
         # Light chips + dark text, so the accents must be gruvbox's BRIGHT set.
         # Using the dark accents here and letting ensure_contrast lift them

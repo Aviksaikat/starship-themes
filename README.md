@@ -162,7 +162,6 @@ Gruvbox-rainbow layout: os, user, path, git, languages, docker/conda, time.
 
 | | |
 |---|---|
-| **gruvbox-material** | ![gruvbox-material](media/png/gruvbox-material.png) |
 | **gruvbox-light** | ![gruvbox-light](media/png/gruvbox-light.png) |
 | **gruvbox-ocean** | ![gruvbox-ocean](media/png/gruvbox-ocean.png) |
 | **gruvbox-forest** | ![gruvbox-forest](media/png/gruvbox-forest.png) |
