@@ -104,7 +104,8 @@ PASTEL_DARK_FG = {
 # These variants get a dark glyph instead (fg = the variant's dark os/time hue,
 # errors a legible dark red).
 PL10K_DARK_CHAR = {
-    "pl10k-rosepine",
+    "pl10k-nord", "pl10k-dracula", "pl10k-tokyo", "pl10k-catppuccin",
+    "pl10k-gruvbox", "pl10k-rosepine",
 }
 
 # ---------------------------------------------------------------------------

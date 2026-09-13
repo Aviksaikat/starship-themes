@@ -41,8 +41,8 @@ continuation_prompt = "[╰─ ](bold green)"
 disabled = false
 
 [character]
-success_symbol = "[](fg:green bg:#CBA6F7)"
-error_symbol = "[✘](fg:red bg:#CBA6F7)"
+success_symbol = "[](fg:#313244 bg:#CBA6F7)"
+error_symbol = "[✘](fg:#8B1A1A bg:#CBA6F7)"
 
 [os]
 format = "[ $symbol ]($style)"
@@ -93,7 +93,7 @@ format = "[[  $time ](fg:#ffffff bg:#313244)]($style)"
 
 [status]
 disabled = false
-format = '[\[$status:$common_meaning\] ](fg:red bg:#CBA6F7)'
+format = '[\[$status:$common_meaning\] ](fg:#8B1A1A bg:#CBA6F7)'
 
 [package]
 style = "fg:#000000 bg:#94E2D5"
