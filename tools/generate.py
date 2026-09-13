@@ -90,7 +90,7 @@ THEMES = {
     ),
     "ninetailedstarship-latte": dict(
         desc="Ninetailed Catppuccin Latte — teal path, mauve git, green lang",
-        path="#179299", git="#8839ef", lang="#40a02b", time="#6c6f85", base="#eff1f5",
+        path="#179299", git="#8839ef", lang="#3d9a29", time="#6c6f85", base="#eff1f5",
     ),
     "ninetailedstarship-frappe": dict(
         desc="Ninetailed Catppuccin Frappé — sky path, mauve git, teal lang",

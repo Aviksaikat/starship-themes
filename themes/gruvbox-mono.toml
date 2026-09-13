@@ -152,11 +152,11 @@ format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 [docker_context]
 symbol = ""
 style = "bg:color_bg3"
-format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+format = '[[ $symbol( $context) ](fg:color_fg0 bg:color_bg3)]($style)'
 
 [conda]
 style = "bg:color_bg3"
-format = '[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)'
+format = '[[ $symbol( $environment) ](fg:color_fg0 bg:color_bg3)]($style)'
 
 [pixi]
 style = "bg:color_bg3"
@@ -182,12 +182,12 @@ vimcmd_visual_symbol = '[](bold fg:color_yellow)'
 
 [palettes.gruvbox-mono]
 color_fg0 = "#fbf1c7"
-color_bg1 = "#32302f"
-color_bg3 = "#504945"
-color_blue = "#a89984"
-color_aqua = "#d5c4a1"
-color_green = "#bdae93"
-color_orange = "#ebdbb2"
-color_purple = "#d5c4a1"
-color_red = "#fb4934"
-color_yellow = "#ddc7a1"
+color_bg1 = "#3c3836"
+color_bg3 = "#665c54"
+color_blue = "#665c54"
+color_aqua = "#7c6f64"
+color_green = "#665c54"
+color_orange = "#7c6f64"
+color_purple = "#504945"
+color_red = "#cc241d"
+color_yellow = "#928374"

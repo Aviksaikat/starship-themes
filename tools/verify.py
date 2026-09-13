@@ -118,18 +118,32 @@ def main():
         pal = read_palette(raw)
         name = t[:-5]
 
+        # This verifier asserts the rounded-chip family's structure. The
+        # powerline variations have no color_path/color_git/color_lang scheme
+        # and are covered by verify_palette.py + verify_contrast.py instead.
+        if "color_path" not in pal:
+            print(f"  skip  {name:24s} (powerline family)")
+            continue
+
         # Assert Apple glyph is present in the TOML source (inside directory format)
         if APPLE not in raw:
             failures.append(f"{name}: missing Apple glyph (󰀵) in theme file")
             print(f"  FAIL  {name:24s} [Apple glyph missing in source]")
             continue
 
+        # Arrow-separated themes (saffron-grove) legitimately carry no rounded
+        # caps -- their segment boundaries are powerline arrows instead, so the
+        # cap assertions don't apply.
+        uses_arrows = ARROW in raw
+
         for scen, cwd in SCEN.items():
             out, err = run(["prompt"], cfg, cwd)
             problems = []
             if "ERROR" in err.upper():
                 problems.append("PARSE-ERROR")
-            if ARROW in out:
+            # Only stray if the theme's own source doesn't ask for the arrow:
+            # saffron-grove uses powerline arrows deliberately.
+            if ARROW in out and ARROW not in raw:
                 problems.append("STRAY-ARROW")
 
             # Strong positional check: Apple must appear INSIDE the path chip body —
@@ -143,7 +157,9 @@ def main():
                     problems.append("apple-glyph-outside-path-chip")
 
             want = [pal["color_path"]]
-            if scen in ("dirty", "clean"):
+            # A CLEAN repo correctly renders no git pill at all, so only the
+            # dirty scenario is expected to carry the git chip background.
+            if scen == "dirty":
                 want.append(pal["color_git"])
             if scen == "pyproj":
                 want.append(pal["color_lang"])
@@ -151,10 +167,11 @@ def main():
                 if "48;2;" + rgb(col) not in out:
                     problems.append("no-chip-bg:" + col)
 
-            if not painted_cap(out, pal["color_path"], L):
-                problems.append("left-cap-unpainted")
-            if not painted_cap(out, pal["color_path"], R):
-                problems.append("right-cap-unpainted")
+            if not uses_arrows:
+                if not painted_cap(out, pal["color_path"], L):
+                    problems.append("left-cap-unpainted")
+                if not painted_cap(out, pal["color_path"], R):
+                    problems.append("right-cap-unpainted")
 
             if not problems:
                 print(f"  ok    {name:24s} {scen}")

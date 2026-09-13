@@ -167,7 +167,6 @@ Gruvbox-rainbow layout: os, user, path, git, languages, docker/conda, time.
 | **gruvbox-ocean** | ![gruvbox-ocean](media/png/gruvbox-ocean.png) |
 | **gruvbox-forest** | ![gruvbox-forest](media/png/gruvbox-forest.png) |
 | **gruvbox-mono** | ![gruvbox-mono](media/png/gruvbox-mono.png) |
-| **gruvbox-neon** | ![gruvbox-neon](media/png/gruvbox-neon.png) |
 
 ---
 
@@ -233,12 +232,23 @@ python3 tools/generate.py              # regenerate the rounded-chip themes
 python3 tools/generate_variations.py   # regenerate the powerline variations
 python3 tools/verify.py                # assert rounded-chip themes render styled pills
 python3 tools/verify_palette.py        # assert every palette colour reaches the output
+python3 tools/verify_contrast.py       # assert chip text is legible (WCAG >= 3:1)
 bash tools/gen_tapes.sh <name>         # re-record one screenshot via VHS
 bash tools/gen_tapes.sh                # re-record all
 ```
 
-`verify_palette.py` matters because Starship **exits 0 and silently strips styling**
-when a `palette =` key fails to resolve — an exit-code check proves nothing.
+Two checks exist because the obvious one is not enough:
+
+- `verify_palette.py` — Starship **exits 0 and silently strips styling** when a
+  `palette =` key fails to resolve, so an exit-code check proves nothing. This
+  asserts the real truecolor escapes reach stdout, and (for the variations)
+  that the *new* colour is present while the *source* colour is gone, so a
+  silent fallback to the original palette can't pass.
+- `verify_contrast.py` — rendering a colour is not the same as being able to
+  read text on it. Every `fg:X bg:Y` pair is resolved and measured; glyph-only
+  groups (the powerline arrows) are exempt because they are intentionally
+  low-contrast shapes. `generate_variations.py` runs the same maths and
+  auto-nudges accents so a variant cannot ship unreadable chips.
 
 ---
 
@@ -246,7 +256,7 @@ when a `palette =` key fails to resolve — an exit-code check proves nothing.
 
 ```
 starship-theme/
-├── themes/          # 42 .toml themes
+├── themes/          # 41 .toml themes
 ├── media/png/       # VHS screenshots (one per theme)
 ├── tapes/           # VHS tape files used to generate screenshots
 ├── tools/
@@ -254,6 +264,7 @@ starship-theme/
 │   ├── generate_variations.py    # powerline variation generator
 │   ├── verify.py                 # chip-structure assertions
 │   ├── verify_palette.py         # palette-resolution assertions
+│   ├── verify_contrast.py        # chip-legibility assertions
 │   ├── render_html.py
 │   ├── gen_tapes.sh
 │   └── preview.sh

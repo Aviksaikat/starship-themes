@@ -43,6 +43,21 @@ def sub_hex(text, mapping):
     return re.sub(r"#[0-9A-Fa-f]{6}", repl, text)
 
 
+def inject_dark_fg(text, fg):
+    """Pin a dark foreground onto module `style*` lines that set only a bg.
+
+    Only matches lines whose quoted value starts with `bg:` -- the separator
+    segments inside `format` already set fg (that IS the powerline arrow
+    colour) and must be left alone.
+    """
+    return re.sub(
+        r'^(\s*style(?:_user|_root)?\s*=\s*)"(bg:[^"]*)"',
+        lambda m: f'{m.group(1)}"fg:{fg} {m.group(2)}"',
+        text,
+        flags=re.M,
+    )
+
+
 # ---------------------------------------------------------------------------
 # 1. pl10k_like — slots in order of first appearance
 #    A os/time/shell bg · B teal transition · C user/status bg · D path
@@ -69,9 +84,27 @@ PASTEL_VARIATIONS = {
     "pastel-nord":       ["#3B4252", "#5E81AC", "#81A1C1", "#88C0D0", "#8FBCBB", "#4C566A"],
     "pastel-dracula":    ["#44475A", "#BD93F9", "#FF79C6", "#8BE9FD", "#6272A4", "#282A36"],
     "pastel-tokyo":      ["#1A1B26", "#7AA2F7", "#F7768E", "#BB9AF7", "#7DCFFF", "#16161E"],
-    "pastel-catppuccin": ["#45475A", "#CBA6F7", "#F38BA8", "#89B4FA", "#94E2D5", "#313244"],
+    "pastel-catppuccin": ["#A6ADC8", "#CBA6F7", "#F38BA8", "#89B4FA", "#94E2D5", "#F9E2AF"],
     "pastel-gruvbox":    ["#3C3836", "#D79921", "#FB4934", "#83A598", "#458588", "#282828"],
-    "pastel-everforest": ["#374145", "#A7C080", "#E67E80", "#7FBBB3", "#83C092", "#2B3339"],
+    "pastel-everforest": ["#D3C6AA", "#A7C080", "#E67E80", "#7FBBB3", "#83C092", "#DBBC7F"],
+}
+
+# Themes whose chips are light enough that the terminal's default (light)
+# foreground is unreadable on them -> pin a dark fg on the module styles.
+# Applied ONLY to `style*` lines that carry a bg; the format's separator
+# segments already set fg (that's what colours the powerline arrow) and must
+# not be touched.
+PASTEL_DARK_FG = {
+    "pastel-catppuccin": "#1E1E2E",
+    "pastel-everforest": "#2B3339",
+}
+
+# pl10k_like hardcodes `fg:green` / `fg:red` for the ✓ / ✘ character glyphs on
+# the character chip. Where that chip is light, the glyph is near-invisible.
+# These variants get a dark glyph instead (fg = the variant's dark os/time hue,
+# errors a legible dark red).
+PL10K_DARK_CHAR = {
+    "pl10k-rosepine",
 }
 
 # ---------------------------------------------------------------------------
@@ -147,18 +180,82 @@ GRUVBOX_OVERRIDES = {
         "color_yellow": "#d7c05a",
     },
     "gruvbox-mono": {
-        "color_fg0": "#fbf1c7", "color_bg1": "#32302f", "color_bg3": "#504945",
-        "color_blue": "#a89984", "color_aqua": "#d5c4a1", "color_green": "#bdae93",
-        "color_orange": "#ebdbb2", "color_purple": "#d5c4a1", "color_red": "#fb4934",
-        "color_yellow": "#ddc7a1",
-    },
-    "gruvbox-neon": {
-        "color_fg0": "#fbf1c7", "color_bg1": "#161616", "color_bg3": "#2e2e2e",
-        "color_blue": "#00d4ff", "color_aqua": "#00ff88", "color_green": "#a6ff00",
-        "color_orange": "#ff8c00", "color_purple": "#d97bff", "color_red": "#ff2e5b",
-        "color_yellow": "#ffe600",
+        # A single color_fg0 serves BOTH the dark bg1/bg3 chips (time, docker)
+        # AND the accent chips (path/git/langs). So fg0 must stay light and the
+        # accents must be medium-dark greys -- making fg0 dark would fix the
+        # accents but leave the time chip dark-on-dark.
+        "color_fg0": "#fbf1c7", "color_bg1": "#3c3836", "color_bg3": "#665c54",
+        "color_blue": "#665c54", "color_aqua": "#7c6f64", "color_green": "#665c54",
+        "color_orange": "#7c6f64", "color_purple": "#504945", "color_red": "#cc241d",
+        "color_yellow": "#928374",
     },
 }
+
+
+def darken_character(text, dark_fg, dark_red):
+    """Make the ✓ / ✘ character glyphs legible on a light character chip.
+
+    pl10k_like hardcodes `fg:green` and `fg:red` against the character
+    background. Only the `fg:...( bg:` forms are rewritten -- the frame's
+    `(bold green)` styling has no background and is left alone.
+    """
+    text = text.replace("fg:green bg:", f"fg:{dark_fg} bg:")
+    text = text.replace("fg:red bg:", f"fg:{dark_red} bg:")
+    return text
+
+
+# ---------------------------------------------------------------------------
+# contrast safety
+# ---------------------------------------------------------------------------
+
+# gruvbox_rainbow derives every chip's text from one `color_fg0` and uses it
+# against BOTH the dark bg1/bg3 chips and the accent chips. A variant that
+# lightens the accents -- or darkens fg0 to suit them -- silently produces
+# unreadable chips (found by eye on gruvbox-mono: a dark time pill). Enforce a
+# minimum contrast instead of hand-tuning 7 accents x 6 variants.
+CHIP_BG_KEYS = ("color_bg1", "color_bg3")
+CHIP_FG_KEYS = ("color_blue", "color_aqua", "color_green", "color_orange",
+                "color_purple", "color_red", "color_yellow")
+
+
+def _lin(c):
+    c /= 255
+    return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def lum(hexstr):
+    h = hexstr.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return 0.2126 * _lin(r) + 0.7152 * _lin(g) + 0.0722 * _lin(b)
+
+
+def contrast(a, b):
+    la, lb = lum(a), lum(b)
+    hi, lo = max(la, lb), min(la, lb)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def _shift(hexstr, toward_white, amount):
+    h = hexstr.lstrip("#")
+    parts = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+    if toward_white:
+        parts = [p + (255 - p) * amount for p in parts]
+    else:
+        parts = [p * (1 - amount) for p in parts]
+    return "#%02x%02x%02x" % tuple(round(p) for p in parts)
+
+
+def ensure_contrast(color, against, target=3.1):
+    """Nudge `color` (hue preserved) until it contrasts >= `target` with `against`."""
+    if contrast(color, against) >= target:
+        return color
+    toward_white = lum(against) < 0.5
+    cur = color
+    for _ in range(200):
+        cur = _shift(cur, toward_white, 0.04)
+        if contrast(cur, against) >= target:
+            return cur
+    return cur
 
 
 def parse_palette(text, block_name):
@@ -202,12 +299,16 @@ def main():
     base = read(os.path.join(SRC, "pl10k_like.toml"))
     for name, colors in PL10K_VARIATIONS.items():
         text = sub_hex(base, dict(zip(PL10K_SLOTS, colors)))
+        if name in PL10K_DARK_CHAR:
+            text = darken_character(text, colors[0], "#8B1A1A")
         generated.append(write(name, text))
 
     # --- pastel-powerline ---
     base = read(os.path.join(SRC, "pastel-powerline.toml"))
     for name, colors in PASTEL_VARIATIONS.items():
         text = sub_hex(base, dict(zip(PASTEL_SLOTS, colors)))
+        if name in PASTEL_DARK_FG:
+            text = inject_dark_fg(text, PASTEL_DARK_FG[name])
         generated.append(write(name, text))
 
     # --- catppuccin ---
@@ -218,7 +319,16 @@ def main():
 
     # --- gruvbox_rainbow ---
     base = read(os.path.join(SRC, "gruvbox_rainbow.toml"))
+    # The template hardcodes #83a598 as the docker/conda text colour on
+    # color_bg3, while [pixi] uses color_fg0 for the same chip. Normalise so
+    # every bg3 chip tracks the variant's fg0.
+    base = base.replace("fg:#83a598 bg:", "fg:color_fg0 bg:")
     for name, ov in GRUVBOX_OVERRIDES.items():
+        ov = dict(ov)
+        fg0 = ov["color_fg0"]
+        for key in CHIP_BG_KEYS + CHIP_FG_KEYS:
+            if key in ov:
+                ov[key] = ensure_contrast(ov[key], fg0)
         text = apply_palette(base, "gruvbox_dark", name, ov)
         generated.append(write(name, text))
 

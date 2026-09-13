@@ -152,11 +152,11 @@ format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 [docker_context]
 symbol = ""
 style = "bg:color_bg3"
-format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+format = '[[ $symbol( $context) ](fg:color_fg0 bg:color_bg3)]($style)'
 
 [conda]
 style = "bg:color_bg3"
-format = '[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)'
+format = '[[ $symbol( $environment) ](fg:color_fg0 bg:color_bg3)]($style)'
 
 [pixi]
 style = "bg:color_bg3"
@@ -184,10 +184,10 @@ vimcmd_visual_symbol = '[](bold fg:color_yellow)'
 color_fg0 = "#ddc7a1"
 color_bg1 = "#32302f"
 color_bg3 = "#5a524c"
-color_blue = "#7daea3"
-color_aqua = "#89b482"
-color_green = "#a9b665"
-color_orange = "#e78a4e"
-color_purple = "#d3869b"
-color_red = "#ea6962"
-color_yellow = "#d8a657"
+color_blue = "#53746c"
+color_aqua = "#587353"
+color_green = "#68703d"
+color_orange = "#995c34"
+color_purple = "#935d6c"
+color_red = "#b04f4a"
+color_yellow = "#846636"

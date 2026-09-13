@@ -52,6 +52,6 @@ error_symbol = "[❯](bold red)"
 [palettes.ninetailedstarship-latte]
 color_path = "#179299"
 color_git = "#8839ef"
-color_lang = "#40a02b"
+color_lang = "#3d9a29"
 color_time = "#6c6f85"
 base = "#eff1f5"
