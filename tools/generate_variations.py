@@ -162,10 +162,14 @@ GRUVBOX_OVERRIDES = {
         "color_yellow": "#d8a657",
     },
     "gruvbox-light": {
-        "color_fg0": "#3c3836", "color_bg1": "#ebdbb2", "color_bg3": "#bdae93",
-        "color_blue": "#458588", "color_aqua": "#689d6a", "color_green": "#79740e",
-        "color_orange": "#d65d0e", "color_purple": "#b16286", "color_red": "#9d0006",
-        "color_yellow": "#b57614",
+        # Light chips + dark text, so the accents must be gruvbox's BRIGHT set.
+        # Using the dark accents here and letting ensure_contrast lift them
+        # produces muddy mid-tones (and a murky olive prompt glyph), because it
+        # starts from the wrong palette.
+        "color_fg0": "#3c3836", "color_bg1": "#ebdbb2", "color_bg3": "#d5c4a1",
+        "color_blue": "#83a598", "color_aqua": "#8ec07c", "color_green": "#b8bb26",
+        "color_orange": "#fe8019", "color_purple": "#d3869b", "color_red": "#fb4934",
+        "color_yellow": "#fabd2f",
     },
     "gruvbox-ocean": {
         "color_fg0": "#fbf1c7", "color_bg1": "#1d2021", "color_bg3": "#3c3836",

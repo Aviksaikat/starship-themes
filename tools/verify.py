@@ -33,6 +33,35 @@ SCEN = {
 }
 
 
+def ensure_scenarios():
+    """Provision the fixture directories this verifier renders against.
+
+    Self-provisioning on purpose: relying on hand-made dirs under /tmp means a
+    routine cleanup silently breaks the suite with a FileNotFoundError instead
+    of a real failure.
+    """
+    def git(*args, cwd):
+        subprocess.run(["git", *args], cwd=cwd, capture_output=True)
+
+    for d in SCEN.values():
+        os.makedirs(d, exist_ok=True)
+
+    for key in ("dirty", "clean"):
+        d = SCEN[key]
+        if not os.path.isdir(os.path.join(d, ".git")):
+            git("init", "-q", cwd=d)
+            git("-c", "user.email=t@t", "-c", "user.name=t",
+                "commit", "--allow-empty", "-m", "init", "-q", cwd=d)
+
+    # `dirty` needs one untracked file so git_status has something to render;
+    # `clean` must stay pristine so git_status contributes nothing.
+    dirty_probe = os.path.join(SCEN["dirty"], "modified.txt")
+    if not os.path.exists(dirty_probe):
+        open(dirty_probe, "w").close()
+
+    open(os.path.join(SCEN["pyproj"], "main.py"), "w").close()
+
+
 def rgb(hexstr):
     h = hexstr.lstrip("#")
     return "%d;%d;%d" % (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
@@ -108,6 +137,7 @@ def apple_in_path_chip(out, color_path):
 
 
 def main():
+    ensure_scenarios()
     themes = sorted(f for f in os.listdir(os.path.join(ROOT, "themes"))
                     if f.endswith(".toml"))
     failures = []
