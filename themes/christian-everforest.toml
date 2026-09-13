@@ -1,0 +1,128 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+# ChristianLempa flat prompt — everforest palette
+# Style: flat text, no chips — OS icon + user + dir + git + detailed status
+
+add_newline = false
+command_timeout = 100
+
+format = """
+$os$username$directory$git_branch$git_status$python$nodejs$rust$golang$c$cmd_duration
+ 
+"""
+
+palette = "christian-everforest"
+
+# --- character (hidden — clean 2-line prompt) --------------------------------
+[character]
+success_symbol = ''
+error_symbol = ''
+
+# --- os icon -----------------------------------------------------------------
+[os]
+format = '[$symbol](bold white) '
+disabled = false
+
+[os.symbols]
+Macos   = '󰀵'
+Linux   = ''
+Ubuntu  = ''
+Arch    = '󰣇'
+Windows = ' '
+
+# --- username ----------------------------------------------------------------
+[username]
+style_user = 'bold color_user'
+style_root = 'bold red'
+format     = '[$user]($style) '
+disabled   = false
+show_always = true
+
+# --- directory ---------------------------------------------------------------
+[directory]
+truncation_length  = 3
+truncation_symbol  = '…/'
+home_symbol        = '󰋜 ~'
+read_only          = '  '
+read_only_style    = 'color_err'
+format             = 'at [$path](bold color_dir)[$read_only]($read_only_style) '
+
+# --- git branch --------------------------------------------------------------
+[git_branch]
+symbol = ' '
+format = 'via [$symbol$branch](bold color_git)'
+truncation_symbol = '…/'
+
+# --- git status (detailed — shows per-state counts) -------------------------
+[git_status]
+format      = '([ \( $all_status$ahead_behind\)](bold color_git) )'
+conflicted  = '[ conflicted=${count}](color_err) '
+up_to_date  = '[󰘽 up-to-date](color_git) '
+untracked   = '[󰋗 untracked=${count}](color_err) '
+ahead       = ' ahead=${count}'
+diverged    = ' ahead=${ahead_count}  behind=${behind_count}'
+behind      = ' behind=${count}'
+stashed     = '[ stashed=${count}](color_git) '
+modified    = '[󰛿 modified=${count}](color_warn) '
+staged      = '[󰐗 staged=${count}](color_git) '
+renamed     = '[󱍸 renamed=${count}](color_warn) '
+deleted     = '[󰍶 deleted=${count}](color_err) '
+
+# --- languages (show only when detected) ------------------------------------
+[python]
+format   = 'via [ $version](color_lang) '
+disabled = false
+
+[nodejs]
+format   = 'via [ $version](color_lang) '
+disabled = false
+
+[rust]
+format   = 'via [ $version](color_lang) '
+disabled = false
+
+[golang]
+format   = 'via [ $version](color_lang) '
+disabled = false
+
+[c]
+format   = 'via [ $version](color_lang) '
+disabled = false
+
+# --- command duration -------------------------------------------------------
+[cmd_duration]
+show_milliseconds = false
+format    = 'took [$duration](color_time) '
+min_time  = 2000
+
+# --- disabled modules -------------------------------------------------------
+[hostname]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[vagrant]
+disabled = true
+
+[helm]
+disabled = true
+
+[ruby]
+disabled = true
+
+[terraform]
+disabled = true
+
+# --- palette -----------------------------------------------------------------
+[palettes.christian-everforest]
+color_user = "#7fbbb3"   # blue — username
+color_dir = "#d699b6"   # mauve — directory
+color_git = "#a7c080"   # green — git
+color_lang = "#83c092"   # sky — language versions
+color_time = "#859289"   # overlay0 — cmd_duration
+color_warn = "#dbbc7f"   # yellow — modified/renamed
+color_err = "#e67e80"   # red — errors/untracked

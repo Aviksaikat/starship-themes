@@ -1,0 +1,124 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+# Standalone sample adapted from Russ McKendrick's Gruvbox setup.
+# Keeps the useful parts: contextual left bar, right-side time,
+# git metrics, battery, command duration, status, and jobs.
+add_newline = false
+scan_timeout = 35
+command_timeout = 700
+palette = 'gruvbox'
+
+format = """
+[](fg:color_orange)$os$username[](fg:color_orange bg:color_yellow)$directory[](fg:color_yellow bg:color_faded_purple)$battery[](fg:color_faded_purple bg:color_faded_blue)$time[](fg:color_faded_blue bg:color_aqua)$git_branch$git_status$git_state$git_metrics[](fg:color_aqua bg:color_blue)$c$cpp$rust$golang$nodejs$python$package[](fg:color_blue bg:color_bg1)$cmd_duration$status$jobs[](fg:color_bg1)
+$character"""
+
+[os]
+disabled = false
+style = 'bg:color_orange fg:color_fg0'
+format = '[ $symbol ]($style)'
+
+[os.symbols]
+Macos = '󰀵'
+Linux = '󰌽'
+Arch = '󰣇'
+Ubuntu = '󰕈'
+
+[username]
+show_always = true
+style_user = 'bg:color_orange fg:color_fg0'
+style_root = 'bg:color_orange fg:color_fg0'
+format = '[ $user ]($style)'
+
+[directory]
+style = 'fg:color_fg0 bg:color_yellow'
+format = '[ $path ]($style)'
+truncation_length = 3
+truncation_symbol = '…/'
+truncate_to_repo = true
+read_only = ' '
+
+[directory.substitutions]
+Documents = '󰈙 '
+Downloads = ' '
+Music = '󰝚 '
+Pictures = ' '
+Code = '󰲋 '
+Developer = '󰲋 '
+
+[battery]
+disabled = false
+full_symbol = '󰁹'
+charging_symbol = '󰂄'
+discharging_symbol = '󰂃'
+format = '[ $symbol $percentage ](fg:color_fg0 bg:color_faded_purple)'
+
+[time]
+disabled = false
+time_format = '%R'
+format = '[ 󰥔 $time ](fg:color_fg0 bg:color_faded_blue)'
+
+[git_branch]
+symbol = ' '
+style = 'bg:color_aqua'
+format = '[ $symbol$branch ](fg:color_fg0 bg:color_aqua)'
+
+[git_status]
+style = 'bg:color_aqua'
+format = '[ $all_status$ahead_behind ](fg:color_fg0 bg:color_aqua)'
+
+[git_state]
+style = 'bg:color_aqua'
+format = '[ $state( $progress_current/$progress_total) ](fg:color_fg0 bg:color_aqua)'
+
+[git_metrics]
+disabled = false
+added_style = 'fg:color_metric_add bg:color_aqua'
+deleted_style = 'fg:color_metric_del bg:color_aqua'
+format = '([+$added ]($added_style))([- $deleted ]($deleted_style))'
+
+[c]
+format = '[ $symbol ](fg:color_fg0 bg:color_blue)'
+[cpp]
+format = '[ $symbol ](fg:color_fg0 bg:color_blue)'
+[rust]
+format = '[ $symbol ](fg:color_fg0 bg:color_blue)'
+[golang]
+format = '[ $symbol ](fg:color_fg0 bg:color_blue)'
+[nodejs]
+format = '[ $symbol ](fg:color_fg0 bg:color_blue)'
+[python]
+format = '[ $symbol ](fg:color_fg0 bg:color_blue)'
+[package]
+format = '[ $symbol $version ](fg:color_fg0 bg:color_blue)'
+
+[cmd_duration]
+min_time = 2000
+format = '[  $duration ](fg:color_fg0 bg:color_bg1)'
+
+[status]
+disabled = false
+format = '[ ✖ $status ](fg:color_bright_red bg:color_bg1)'
+
+[jobs]
+threshold = 1
+symbol = ' '
+format = '[ $symbol$number ](fg:color_bright_orange bg:color_bg1)'
+
+[character]
+success_symbol = '[❯](bold color_bright_green)'
+error_symbol = '[❯](bold color_bright_red)'
+
+[palettes.gruvbox]
+color_fg0 = "#fbf1c7"
+color_bg1 = "#3c3836"
+color_yellow = "#d79921"
+color_orange = "#d65d0e"
+color_faded_purple = "#8f3f71"
+color_faded_blue = "#076678"
+color_aqua = "#689d6a"
+color_blue = "#458588"
+color_bright_red = "#fb4934"
+color_bright_orange = "#fe8019"
+color_bright_green = "#b8bb26"
+color_metric_add = "#eaffb0"
+color_metric_del = "#ffefef"

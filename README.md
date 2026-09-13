@@ -170,6 +170,24 @@ Gruvbox-rainbow layout: os, user, path, git, languages, docker/conda, time.
 
 ---
 
+# Part 3 — Flat prompt variations
+
+Christian Lempa-inspired flat prompts: OS icon, username, directory, detailed
+git status, detected language, and command duration. Same layout, different
+palettes.
+
+| Theme | Preview |
+|---|---|
+| **christian-lempa** | ![christian-lempa](media/png/christian-lempa.png) |
+| **christian-tokyo-night** | ![christian-tokyo-night](media/png/christian-tokyo-night.png) |
+| **christian-nord** | ![christian-nord](media/png/christian-nord.png) |
+| **christian-gruvbox** | ![christian-gruvbox](media/png/christian-gruvbox.png) |
+| **christian-rosepine** | ![christian-rosepine](media/png/christian-rosepine.png) |
+| **christian-everforest** | ![christian-everforest](media/png/christian-everforest.png) |
+| **russ-gruvbox** | ![russ-gruvbox](media/png/russ-gruvbox.png) |
+
+---
+
 ## Install
 
 ```bash
@@ -256,7 +274,7 @@ Two checks exist because the obvious one is not enough:
 
 ```
 starship-theme/
-├── themes/          # 41 .toml themes
+├── themes/          # 48 .toml themes
 ├── media/png/       # VHS screenshots (one per theme)
 ├── tapes/           # VHS tape files used to generate screenshots
 ├── tools/
